@@ -5,6 +5,7 @@
 
 #include <vector>
 
+//Joseph hong is here 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
 #include <d3dcompiler.h>
