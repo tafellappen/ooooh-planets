@@ -349,4 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-!Assets/*.obj
+# DONT ignore the obj files in the models folder, because they are 3d models
+!DX11Starter/Assets/Models/*.obj
