@@ -153,6 +153,34 @@ void Game::Init()
 		nullptr,
 		srvTexture2Metal.GetAddressOf()
 	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_test.tif").c_str(),
+		nullptr,
+		sunAlbedo.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_normal.tif").c_str(),
+		nullptr,
+		sunNormal.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_rough.tif").c_str(),
+		nullptr,
+		sunRough.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_metal.tif").c_str(),
+		nullptr,
+		sunMetal.GetAddressOf()
+	);
 	
 
 
@@ -300,6 +328,7 @@ void Game::CreateBasicGeometry()
 	//materials.push_back(std::make_shared<Material>(red, pixelShader, vertexShader, srvTexture1Albedo, sampler, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture1Albedo, sampler, srvTexture1Normal, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture2Albedo, sampler, srvTexture2Normal, srvTexture2Metal, srvTexture2Rough));
+	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunAlbedo, sampler, sunNormal, sunMetal, sunRough));
 
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file
@@ -307,6 +336,8 @@ void Game::CreateBasicGeometry()
 	entities.push_back(new Entity(meshes[1], materials[1])); //cube obj file
 	entities.push_back(new Entity(meshes[2], materials[0])); //helix obj file
 	entities.push_back(new Entity(meshes[2], materials[1])); //helix obj file
+
+	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
 
 
 	//give a starting position so they're not on top of each other
@@ -316,6 +347,8 @@ void Game::CreateBasicGeometry()
 	entities[3]->GetTransform()->SetPosition(1, -1, 0);
 	entities[4]->GetTransform()->SetPosition(-3, 0, 0);
 	entities[5]->GetTransform()->SetPosition(3, 0, 0);
+	entities[6]->GetTransform()->SetPosition(5, 1, 0);
+
 }
 
 //void Game::DrawMesh(Mesh* mesh)
