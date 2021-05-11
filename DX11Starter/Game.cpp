@@ -239,8 +239,8 @@ void Game::Init()
 	//transform.SetScale(0.5f, 0.5f, 0.5f);
 	/*transform.SetRotation(0, 0, XM_PIDIV4);*/
 
-	bloomThreshold = 1.0f;
-	bloomLevelIntensity = 5.0f;
+	bloomThreshold = 0.5f;
+	bloomLevelIntensity = 4.0f;
 	ResizeAllPostProcessResources();
 
 	skybox = std::make_shared<Sky>(
@@ -799,12 +799,12 @@ void Game::BloomCombine()
 	// Activate the shader and set resources
 	bloomCombinePS->SetShader();
 	bloomCombinePS->SetShaderResourceView("originalPixels", ppSRV.Get()); // Set the original render
-	bloomCombinePS->SetShaderResourceView("bloomedPixels0", blurVerticalSRV.Get()); // And all other bloom levels
+	bloomCombinePS->SetShaderResourceView("bloomedPixels", blurVerticalSRV.Get()); // And all other bloom levels
 
 	// Note: Sampler set already!
 
 	// Set post process specific data
-	bloomCombinePS->SetFloat("intensityLevel0", bloomLevelIntensity);
+	bloomCombinePS->SetFloat("intensityLevel", bloomLevelIntensity);
 	bloomCombinePS->CopyAllBufferData();
 
 	// Draw exactly 3 vertices for our "full screen triangle"
