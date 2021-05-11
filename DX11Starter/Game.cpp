@@ -165,7 +165,7 @@ void Game::Init()
 		context.Get(),
 		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_test.tif").c_str(),
 		nullptr,
-		sunAlbedo.GetAddressOf()
+		sunEmmisive.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
@@ -330,6 +330,10 @@ void Game::LoadShaders()
 		context.Get(),
 		GetFullPathTo_Wide(L"GaussianPS.cso").c_str());
 
+	/*emissivePS = new SimplePixelShader(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"Emissive.cso").c_str());*/
 	//skyVS = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"SkyboxVS.cso").c_str());
 	//skyPS = std::make_shared<SimplePixelShader>(device.Get(), context.Get(),  GetFullPathTo_Wide(L"SkyboxPS.cso").c_str());
 
@@ -359,7 +363,8 @@ void Game::CreateBasicGeometry()
 	//materials.push_back(std::make_shared<Material>(red, pixelShader, vertexShader, srvTexture1Albedo, sampler, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture1Albedo, sampler, srvTexture1Normal, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture2Albedo, sampler, srvTexture2Normal, srvTexture2Metal, srvTexture2Rough));
-	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunAlbedo, sampler, sunNormal, sunMetal, sunRough));
+	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
+	//materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file

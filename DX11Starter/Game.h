@@ -91,7 +91,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture2Metal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture2Rough;
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunAlbedo;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunEmmisive;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunNormal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunMetal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunRough;
@@ -119,6 +119,8 @@ private:
 	SimplePixelShader* bloomExtractPS;
 	SimplePixelShader* bloomCombinePS;
 	SimplePixelShader* gaussianBlurPS;
+
+	//SimplePixelShader* emissivePS;
 
 	//skybox stuff
 	std::shared_ptr<Sky> skybox;
