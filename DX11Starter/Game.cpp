@@ -135,28 +135,32 @@ void Game::Init()
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_albedo.tif").c_str(),
 		nullptr,
 		srvTexture2Albedo.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_normal.tif").c_str(),
 		nullptr,
 		srvTexture2Normal.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/foil_roughness.tif").c_str(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_roughness.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_roughness.tif").c_str(),
 		nullptr,
 		srvTexture2Rough.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/planet2_metalic.tif").c_str(),
 		nullptr,
 		srvTexture2Metal.GetAddressOf()
 	);
