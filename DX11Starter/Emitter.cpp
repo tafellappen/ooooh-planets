@@ -321,6 +321,32 @@ void Emitter::CopyOneParticle(int index, std::shared_ptr<Camera> camera)
 
 DirectX::XMFLOAT3 Emitter::CalcParticleVertexPosition(int particleIndex, int quadCornerIndex, std::shared_ptr<Camera> camera)
 {
-	//this boi next
-    return DirectX::XMFLOAT3();
+	//get right and up vectors from view matrix
+	XMFLOAT4X4 view = camera->GetViewMatrix();
+
+	XMVECTOR camRight = XMVectorSet(view._11, view._21, view._31, 0);
+	XMVECTOR camUp = XMVectorSet(view._12, view._22, view._32, 0);
+
+	//determine offset of this particular quad corner
+	//UV's are already set when emitter is created, so we can start with that and then modify for each corner
+	XMFLOAT2 offset = DefaultUVs[quadCornerIndex];
+	offset.x = offset.x * 2 - 1; //expand from [0, 1] to [-1, 1]
+	offset.y = (offset.y * -2 + 1); //flip for y
+
+	//load into a vector as a float 3 with a Z of 0
+	//create and apply a X rotation matrix to the offset
+	XMVECTOR offsetVec = XMLoadFloat2(&offset);
+	XMMATRIX rotMatrix = XMMatrixRotationZ(particles[particleIndex].Rotation);
+	offsetVec = XMVector3Transform(offsetVec, rotMatrix);
+
+	//add and scale the camera up and right vectors to the position of the particle
+	XMVECTOR posVec = XMLoadFloat3(&particles[particleIndex].Position);
+	posVec += camRight * XMVectorGetX(offsetVec) * particles[particleIndex].Size;
+	posVec += camUp * XMVectorGetY(offsetVec) * particles[particleIndex].Size;
+
+	//set the position to the return value
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, posVec);
+	return pos;
+
 }
