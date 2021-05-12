@@ -86,9 +86,13 @@ Game::~Game()
 	//vertexShader = nullptr;
 
 	delete ppVS;
+	ppVS = nullptr;
 	delete bloomExtractPS;
+	bloomExtractPS = nullptr;
 	delete bloomCombinePS;
+	bloomCombinePS = nullptr;
 	delete gaussianBlurPS;
+	gaussianBlurPS = nullptr;
 }
 
 // --------------------------------------------------------
@@ -683,7 +687,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	}
 
-	
+	DrawParticles();
 
 	skybox->DrawSky(context, camera);
 
