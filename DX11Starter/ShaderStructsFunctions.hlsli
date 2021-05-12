@@ -20,6 +20,12 @@ struct VertexShaderInput
 	float3 uv			: TEXCOORD;
 };
 
+struct VertexShaderInput_Particle
+{
+	float3 position		: POSITION;
+	float2 uv			: TEXCOORD;
+	float4 color		: COLOR;
+};
 
 // Struct representing the data we're sending down the pipeline
 // - Should match our pixel shader's input (hence the name: Vertex to Pixel)
@@ -64,6 +70,24 @@ struct VertexToPixel_Sky
 	//  v    v                v
 	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
 	float3 sampleDir	: DIRECTION;
+};
+
+struct VertexToPixel_Particle
+{
+	float4 position		: SV_POSITION;
+	float2 uv           : TEXCOORD0;
+	float4 color		: TEXCOORD1;
+};
+
+struct VertexToPixel_PostProcess
+{
+	// Data type
+	//  |
+	//  |   Name          Semantic
+	//  |    |                |
+	//  v    v                v
+	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
+	float2 uv			: TEXCOORD0;
 };
 
 struct DirectionalLight
