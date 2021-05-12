@@ -160,9 +160,41 @@ void Game::Init()
 		device.Get(),
 		context.Get(),
 		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/planet2_metalic.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_metalic.tif").c_str(),
 		nullptr,
 		srvTexture2Metal.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_albedo.tif").c_str(),
+		nullptr,
+		srvTexture3Albedo.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_normal.tif").c_str(),
+		nullptr,
+		srvTexture3Normal.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_roughness.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_roughness.tif").c_str(),
+		nullptr,
+		srvTexture3Rough.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/planet1_metalic.tif").c_str(),
+		nullptr,
+		srvTexture3Metal.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
@@ -244,7 +276,7 @@ void Game::Init()
 	/*transform.SetRotation(0, 0, XM_PIDIV4);*/
 
 	bloomThreshold = 0.5f;
-	bloomLevelIntensity = 6.0f;
+	bloomLevelIntensity = 9.0f;
 	ResizeAllPostProcessResources();
 
 	skybox = std::make_shared<Sky>(
@@ -367,6 +399,7 @@ void Game::CreateBasicGeometry()
 	//materials.push_back(std::make_shared<Material>(red, pixelShader, vertexShader, srvTexture1Albedo, sampler, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture1Albedo, sampler, srvTexture1Normal, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture2Albedo, sampler, srvTexture2Normal, srvTexture2Metal, srvTexture2Rough));
+	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture3Albedo, sampler, srvTexture3Normal, srvTexture3Metal, srvTexture3Rough));
 	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 	//materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 
@@ -377,7 +410,7 @@ void Game::CreateBasicGeometry()
 	//entities.push_back(new Entity(meshes[2], materials[0])); //helix obj file
 	//entities.push_back(new Entity(meshes[2], materials[1])); //helix obj file
 
-	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
+	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
 
 
 	//give a starting position so they're not on top of each other
