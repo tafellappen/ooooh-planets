@@ -135,7 +135,14 @@ void Game::Init()
 		context.Get(),
 		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_test.tif").c_str(),
 		nullptr,
-		sunEmmisive.GetAddressOf()
+		sunEmissTex.GetAddressOf()
+	);
+	CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/Sun/sun_mask.tif").c_str(),
+		nullptr,
+		sunMask.GetAddressOf()
 	);
 	CreateWICTextureFromFile(
 		device.Get(),
@@ -210,7 +217,7 @@ void Game::Init()
 	/*transform.SetRotation(0, 0, XM_PIDIV4);*/
 
 	bloomThreshold = 0.5f;
-	bloomLevelIntensity = 9.0f;
+	bloomLevelIntensity = 1.0f;
 	ResizeAllPostProcessResources();
 
 	skybox = std::make_shared<Sky>(
@@ -234,14 +241,14 @@ void Game::Init()
 	lights.push_back({
 		0,
 		green,
-		1.0f,
+		0.0f,
 		XMFLOAT3(1.0f, -1.0f, 0.0f)
 		});
 
 	lights.push_back({
 		0,
 		white,
-		1.0f,
+		0.0f,
 		XMFLOAT3(-1.0f, -1.0f, 0.0f)
 		});
 
@@ -255,9 +262,9 @@ void Game::Init()
 	//point light
 	lights.push_back({
 		1,
-		lightBlue,
-		1.0f,
-		XMFLOAT3(-1.0f, -1.0f, -1.0f)
+		white,
+		30.0f,
+		XMFLOAT3(0.0f, 0.0f, 0.0f)
 		});
 
 
@@ -282,6 +289,8 @@ void Game::LoadShaders()
 
 	vertexShaderParticle = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticleVS.cso").c_str());
 	pixelShaderParticle = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticlePS.cso").c_str());
+	
+	emissivePS = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"EmissivePS.cso").c_str());
 
 	ppVS = new SimpleVertexShader(
 		device.Get(),
@@ -338,13 +347,14 @@ void Game::CreateBasicGeometry()
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture2Albedo, sampler, srvTexture2Normal, srvTexture2Metal, srvTexture2Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture3Albedo, sampler, srvTexture3Normal, srvTexture3Metal, srvTexture3Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture4Albedo, sampler, srvTexture4Normal, srvTexture4Metal, srvTexture4Rough));
-	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
+	materials.push_back(std::make_shared<Material>(white, emissivePS, vertexShader, sunEmissTex, sampler, sunMask, sunRough));
 	//materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
-	entities.push_back(new Entity(meshes[0], materials[3])); //sphere obj file
+	//entities.push_back(new Entity(meshes[0], materials[4])); //sphere obj file
+	sun = std::make_shared<Entity>(meshes[0], materials[4]);
 
 
 	//give a starting position so they're not on top of each other
@@ -586,6 +596,37 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Change the render target to the first one for bloom
 	context->OMSetRenderTargets(1, ppRTV.GetAddressOf(), depthStencilView.Get());
 	
+	//draw sun
+	{
+		//emissivePS->SetFloat("specularExponent", sun->GetMaterial()->GetSpecularExponent());
+		emissivePS->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
+
+		emissivePS->CopyAllBufferData();
+
+		emissivePS->SetShaderResourceView("emissiveTexture", sun->GetMaterial()->GetTextureSRV().Get());
+		emissivePS->SetShaderResourceView("roughnessMap", sun->GetMaterial()->GetRoughnessSRV().Get());
+		emissivePS->SetShaderResourceView("mask", sun->GetMaterial()->GetMetalnessSRV().Get());
+		emissivePS->SetSamplerState("basicSampler", sun->GetMaterial()->GetSamplerState().Get());
+
+		sun->GetMaterial()->GetVertexShader()->SetShader();
+		sun->GetMaterial()->GetPixelShader()->SetShader();
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+
+		std::shared_ptr<SimpleVertexShader> sunVertShader = sun->GetMaterial()->GetVertexShader();
+		sunVertShader->SetFloat4("colorTint", sun->GetMaterial()->GetColorTint());//do i even still need color tint
+		sunVertShader->SetMatrix4x4("world", sun->GetTransform()->GetWorldMatrix());
+		sunVertShader->SetMatrix4x4("view", camera->GetViewMatrix());
+		sunVertShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+		sunVertShader->CopyAllBufferData();
+
+		context->IASetVertexBuffers(0, 1, sun->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(sun->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->Draw(sun->GetMesh()->GetIndexCount(), 0);
+	}
 
 	for (int i = 0; i < entities.size(); i++)
 	{

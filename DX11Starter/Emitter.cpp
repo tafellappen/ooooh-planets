@@ -277,6 +277,12 @@ void Emitter::CopyParticlesToGPU(Microsoft::WRL::ComPtr<ID3D11DeviceContext> con
 	}
 
 	//now send the updated buffer to the GPU
+	/*D3D11_MAPPED_SUBRESOURCE mapped = {};
+	context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+	memcpy(mapped.pData, localParticleVertices, sizeof(ParticleVertex) * 4 * maxParticles);
+
+	context->Unmap(vertexBuffer.Get(), 0);*/
 	D3D11_MAPPED_SUBRESOURCE mapped = {};
 	context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
 

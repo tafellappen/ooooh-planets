@@ -67,6 +67,7 @@ private:
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
 	std::vector<Entity*> entities;
+	std::shared_ptr<Entity> sun;
 	std::vector<std::shared_ptr<Material>> materials;
 	
 	std::vector<DirectionalLight> lights;
@@ -78,6 +79,7 @@ private:
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShaderNormal;
 	std::shared_ptr<SimpleVertexShader> vertexShaderNormal;
+	std::shared_ptr<SimplePixelShader> emissivePS; //will not use normal
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 	std::shared_ptr<Camera> camera; 
 	DirectX::XMFLOAT3 ambientColor;
@@ -103,7 +105,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Metal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Rough;
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunEmmisive;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunEmissTex;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunMask;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunNormal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunMetal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunRough;
