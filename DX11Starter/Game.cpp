@@ -417,6 +417,8 @@ void Game::OnResize()
 	DXCore::OnResize();
 
 	camera->UpdateProjectionMatrix((float)width / (float)height);
+
+	ResizeAllPostProcessResources();
 }
 
 // --------------------------------------------------------
@@ -510,8 +512,8 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->ClearRenderTargetView(ppRTV.Get(), backgroundColor);
 	context->ClearRenderTargetView(bloomExtractRTV.Get(), backgroundColor);
 
-	/*context->ClearRenderTargetView(blurHorizontalRTV.Get(), backgroundColor);
-	context->ClearRenderTargetView(blurVerticalRTV.Get(), backgroundColor);*/
+	context->ClearRenderTargetView(blurHorizontalRTV.Get(), backgroundColor);
+	context->ClearRenderTargetView(blurVerticalRTV.Get(), backgroundColor);
 
 	// Post Processing - Pre-Draw
 	// Change the render target to the first one for bloom
@@ -631,7 +633,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	ppVS->SetShader();
 
 	// Assuming all of the post process steps have a single sampler at register 0
-	context->PSSetSamplers(0, 1, ppSampler.GetAddressOf());
+	context->PSSetSamplers(0, 1, sampler.GetAddressOf());
 
 	// Handle the bloom extraction
 	BloomExtract();
