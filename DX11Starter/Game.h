@@ -11,6 +11,7 @@
 #include "Material.h"
 #include "Lights.h"
 #include "Sky.h"
+#include "Emitter.h"
 #include "WICTextureLoader.h"
 #include <vector>
 class Game 
@@ -84,14 +85,15 @@ private:
 
 	//skybox stuff
 	std::shared_ptr<Sky> skybox;
-	//std::shared_ptr<SimplePixelShader> skyPS;
-	//std::shared_ptr<SimpleVertexShader> skyVS;
-	//std::shared_ptr<Mesh> skyMesh;
-	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyRasterState;
 
+	//Particle variables
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleTexture;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> particleDepthState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> particleBlendState;
+	std::shared_ptr<SimplePixelShader> pixelShaderParticle;
+	std::shared_ptr<SimpleVertexShader> vertexShaderParticle;
+	std::shared_ptr<Emitter> emitter1;
 
-	//for testing
-	//Transform transform;
 
 
 };
