@@ -180,7 +180,7 @@ void Game::Init()
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateBasicGeometry();
-
+	ParticleSetup();
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -271,6 +271,9 @@ void Game::LoadShaders()
 	vertexShaderNormal = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapVS.cso").c_str());
 	pixelShaderNormal = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"NormalMapPS.cso").c_str());
 
+	vertexShaderParticle = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticleVS.cso").c_str());
+	pixelShaderParticle = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticlePS.cso").c_str());
+
 	//skyVS = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"SkyboxVS.cso").c_str());
 	//skyPS = std::make_shared<SimplePixelShader>(device.Get(), context.Get(),  GetFullPathTo_Wide(L"SkyboxPS.cso").c_str());
 
@@ -318,6 +321,65 @@ void Game::CreateBasicGeometry()
 	entities[5]->GetTransform()->SetPosition(3, 0, 0);
 }
 
+void Game::ParticleSetup()
+{
+	//get the texture
+	std::wstring particleTexPath = GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str();
+	HRESULT r = CreateWICTextureFromFile(
+		device.Get(), 
+		context.Get(), 
+		GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(), 
+		0, particleTexture.GetAddressOf());
+
+	//make the depth state
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; //don't write depth
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, particleDepthState.GetAddressOf());
+
+	//additive blending for particles
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; //still respect pix shader output alpha
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, particleBlendState.GetAddressOf());
+
+	//debug rasterizer state for particles
+	D3D11_RASTERIZER_DESC rd = {};
+	rd.CullMode = D3D11_CULL_BACK; //backface culling
+	rd.DepthClipEnable = true;
+	rd.FillMode = D3D11_FILL_WIREFRAME;
+	device->CreateRasterizerState(&rd, particleDebugRasterState.GetAddressOf());
+	
+	//setting up the actual particles
+	emitter1 = std::make_shared<Emitter>(
+		110,							// Max particles
+		20,								// Particles per second
+		5,								// Particle lifetime
+		0.1f,							// Start size
+		2.0f,							// End size
+		XMFLOAT4(1, 0.1f, 0.1f, 0.7f),	// Start color
+		XMFLOAT4(1, 0.6f, 0.1f, 0),		// End color
+		XMFLOAT3(-2, 2, 0),				// Start velocity
+		XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
+		XMFLOAT3(2, 0, 0),				// Emitter position
+		XMFLOAT3(0.1f, 0.1f, 0.1f),		// Position randomness range
+		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+		XMFLOAT3(0, -1, 0),				// Constant acceleration
+		device,
+		vertexShaderParticle,
+		pixelShaderParticle,
+		particleTexture);
+}
+
 //void Game::DrawMesh(Mesh* mesh)
 //{
 //}
@@ -349,6 +411,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 
 	camera->Update(deltaTime, this->hWnd);
+	emitter1->Update(deltaTime);
 }
 //
 //void Game::CreateLights()
@@ -459,6 +522,10 @@ void Game::Draw(float deltaTime, float totalTime)
 		entities[i]->GetMaterial()->GetPixelShader()->SetShader();
 
 
+
+
+
+
 		// Ensure the pipeline knows how to interpret the data (numbers)
 		// from the vertex buffer.  
 		// - If all of your 3D models use the exact same vertex layout,
@@ -517,6 +584,8 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	}
 
+	
+
 	skybox->DrawSky(context, camera);
 
 	// Present the back buffer to the user
@@ -529,8 +598,25 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
 }
 
-void Game::DrawSky()
+void Game::DrawParticles()
 {
+	//particle drawing-----
+// Particle states
+	context->OMSetBlendState(particleBlendState.Get(), 0, 0xffffffff);	// Additive blending
+	context->OMSetDepthStencilState(particleDepthState.Get(), 0);		// No depth WRITING
+
+	// wireframe setting - set to 0 for no wireframe, 1 for wireframe
+	pixelShaderParticle->SetInt("debugWireframe", 0); //<-- here
+	pixelShaderParticle->CopyAllBufferData();
+
+	//draw emitters
+	emitter1->Draw(context, camera);
+
+	// Reset to default states for next frame
+	context->OMSetBlendState(0, 0, 0xffffffff);
+	context->OMSetDepthStencilState(0, 0);
+	context->RSSetState(0);
+
 	////change to sky-specific rasterizer state
 	//context->RSSetState(skybox->GetRasterizerOptions().Get());
 

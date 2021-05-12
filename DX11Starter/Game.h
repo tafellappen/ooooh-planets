@@ -37,7 +37,9 @@ private:
 	void LoadShaders(); 
 	void CreateBasicGeometry();
 
-	void DrawSky();
+	void ParticleSetup();
+
+	void DrawParticles();
 
 	//void DrawMesh(Mesh* mesh);
 	//void CreateLights();
@@ -90,6 +92,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleTexture;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> particleDepthState;
 	Microsoft::WRL::ComPtr<ID3D11BlendState> particleBlendState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> particleDebugRasterState;
 	std::shared_ptr<SimplePixelShader> pixelShaderParticle;
 	std::shared_ptr<SimpleVertexShader> vertexShaderParticle;
 	std::shared_ptr<Emitter> emitter1;

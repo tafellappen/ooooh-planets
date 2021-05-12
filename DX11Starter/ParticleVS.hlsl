@@ -24,26 +24,18 @@ cbuffer ExternalData : register(b0)
 // - Output is a single struct of data to pass down the pipeline
 // - Named "main" because that's the default the shader compiler looks for
 // --------------------------------------------------------
-VertexToPixel_NormalMap main(VertexShaderInput input)
+VertexToPixel_Particle main(VertexShaderInput_Particle input)
 {
 	// Set up output struct
-	VertexToPixel_NormalMap output;
+	VertexToPixel_Particle output;
 
-	matrix wvp = mul(mul(projection, view), world);
-	output.position = mul(wvp, float4(input.position, 1.0f));
+	//calculate output position
+	matrix viewProj = mul(projection, view);
+	output.position = mul(viewProj, float4(input.position, 1.0f));
 
-	// Pass the color through 
-	output.color = colorTint;
+	//pass uv
+	output.uv = input.uv;
+	output.color = input.color;
 
-	output.uv = input.uv; //we have to remember to set everything in the VertexToPixel in both shaders
-
-	output.normal = mul((float3x3)world, input.normal);
-	output.tangent = mul((float3x3)world, input.tangent);
-
-	//for point lights - get the worldspace position of this vertex
-	output.worldPos = mul(input.position, world);
-
-	// Whatever we return will make its way through the pipeline to the
-	// next programmable stage we're using (the pixel shader for now)
 	return output;
 }
