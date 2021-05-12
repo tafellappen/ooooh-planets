@@ -244,7 +244,7 @@ void Game::Init()
 	/*transform.SetRotation(0, 0, XM_PIDIV4);*/
 
 	bloomThreshold = 0.5f;
-	bloomLevelIntensity = 4.0f;
+	bloomLevelIntensity = 6.0f;
 	ResizeAllPostProcessResources();
 
 	skybox = std::make_shared<Sky>(
@@ -372,22 +372,26 @@ void Game::CreateBasicGeometry()
 
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file
-	entities.push_back(new Entity(meshes[1], materials[0])); //cube obj file
-	entities.push_back(new Entity(meshes[1], materials[1])); //cube obj file
-	entities.push_back(new Entity(meshes[2], materials[0])); //helix obj file
-	entities.push_back(new Entity(meshes[2], materials[1])); //helix obj file
+	//entities.push_back(new Entity(meshes[1], materials[0])); //cube obj file
+	//entities.push_back(new Entity(meshes[1], materials[1])); //cube obj file
+	//entities.push_back(new Entity(meshes[2], materials[0])); //helix obj file
+	//entities.push_back(new Entity(meshes[2], materials[1])); //helix obj file
 
-	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
+	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 
 
 	//give a starting position so they're not on top of each other
-	entities[0]->GetTransform()->SetPosition(-1, 1, 0);
-	entities[1]->GetTransform()->SetPosition(1, 1, 0);
-	entities[2]->GetTransform()->SetPosition(-1, -1, 0);
+	entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
+	entities[1]->GetTransform()->SetPosition(0, -1, 6);
+	/*entities[2]->GetTransform()->SetPosition(-1, -1, 0);
 	entities[3]->GetTransform()->SetPosition(1, -1, 0);
 	entities[4]->GetTransform()->SetPosition(-3, 0, 0);
-	entities[5]->GetTransform()->SetPosition(3, 0, 0);
-	entities[6]->GetTransform()->SetPosition(5, 1, 0);
+	entities[5]->GetTransform()->SetPosition(3, 0, 0);*/
+	entities[2]->GetTransform()->SetPosition(0, -1, 0);
+	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
+	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	entities[2]->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);
+
 
 }
 
@@ -471,6 +475,8 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 		entities[i]->GetTransform()->Rotate(0, deltaTime, 0);
 	}
+	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 4, 0, (float)sin(totalTime) * deltaTime * 4);
+	entities[1]->GetTransform()->MoveAbsolute((float)cos(-totalTime) * deltaTime * 6, 0, (float)sin(-totalTime) * deltaTime * 6);
 
 	camera->Update(deltaTime, this->hWnd);
 }
