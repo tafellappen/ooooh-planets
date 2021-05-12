@@ -38,8 +38,18 @@ private:
 	void CreateBasicGeometry();
 
 	void ParticleSetup();
+	void ResizeAllPostProcessResources();
+	void ResizeOnePostProcessResource(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtv, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, float renderTargetScale = 1.0f);
 
 	void DrawParticles();
+
+	void BloomExtract();
+	void SingleDirectionBlur(
+		float renderTargetScale,
+		DirectX::XMFLOAT2 blurDirection,
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> target,
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sourceTexture);
+	void BloomCombine();
 
 	//void DrawMesh(Mesh* mesh);
 	//void CreateLights();
@@ -83,7 +93,46 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture2Metal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture2Rough;
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Albedo;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Normal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Metal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Rough;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Albedo;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Normal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Metal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Rough;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunEmmisive;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunNormal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunMetal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunRough;
+
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
+
+	float bloomThreshold;
+	float bloomLevelIntensity;
+
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> ppSampler; // Clamp sampler for post processing
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV;		// Allows us to render to a texture
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV;		// Allows us to sample from the same texture
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> bloomExtractRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> bloomExtractSRV;
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> blurHorizontalRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> blurHorizontalSRV;
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> blurVerticalRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> blurVerticalSRV;
+
+	SimpleVertexShader* ppVS;
+	SimplePixelShader* bloomExtractPS;
+	SimplePixelShader* bloomCombinePS;
+	SimplePixelShader* gaussianBlurPS;
+
+	//SimplePixelShader* emissivePS;
 
 	//skybox stuff
 	std::shared_ptr<Sky> skybox;
