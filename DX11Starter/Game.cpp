@@ -432,8 +432,8 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 		entities[i]->GetTransform()->Rotate(0, deltaTime, 0);
 	}
-	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 4, 0, (float)sin(totalTime) * deltaTime * 4);
-	entities[1]->GetTransform()->MoveAbsolute((float)cos(-totalTime) * deltaTime * 6, 0, (float)sin(-totalTime) * deltaTime * 6);
+	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 2, 0, (float)sin(totalTime) * deltaTime * 3);
+	entities[1]->GetTransform()->MoveAbsolute((float)cos(-totalTime) * deltaTime * 4, 0, (float)sin(-totalTime) * deltaTime * 3);
 
 	camera->Update(deltaTime, this->hWnd);
 }
