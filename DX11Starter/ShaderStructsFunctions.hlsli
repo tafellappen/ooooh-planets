@@ -269,10 +269,20 @@ float3 CalcLightingColor(float3 normal, float3 worldPosition, DirectionalLight l
 		directionToLight = light.DirectionOrPos - worldPosition;
 		directionOfLight = normalize(-directionToLight);
 	}
+	// 	float diffuseVal = Diffuse(normal, directionToLight);
+// 	float specVal = Specular(normal, worldPosition, specExp, cameraWorldPos, directionOfLight);
+// 	specVal *= any(diffuseVal); //this is for when the normals cause "self-shadowing"
+
+// 	float3 finalColor = (diffuseVal * light.Color * surfaceColor) + specVal;
+// 	// +
+// 	//(ambientColor * surfaceColor);
+
+// 	return finalColor;
+
 	float3 view = normalize(cameraWorldPos - worldPosition); //direction to the camera
 
 	float diffuseVal = DiffusePBR(normal, directionToLight);
-	float3 specVal = MicrofacetBRDF(normal, directionToLight, view, roughness, metalness, specularColor);
+	float3 specVal = MicrofacetBRDF(normal, directionOfLight, view, roughness, metalness, specularColor);
 	specVal *= any(diffuseVal);
 
 	//conserving energy
