@@ -96,6 +96,10 @@ Emitter::Emitter(int maxParticles, int particlesPerSecond, float lifetime, float
 
 Emitter::~Emitter()
 {
+	delete particles;
+	particles = nullptr;
+	delete localParticleVertices;
+	localParticleVertices = nullptr;
 }
 
 void Emitter::Update(float dt)
