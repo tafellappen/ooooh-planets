@@ -96,6 +96,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Metal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture3Rough;
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Albedo;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Normal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Metal;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srvTexture4Rough;
+
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunEmmisive;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunNormal;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sunMetal;

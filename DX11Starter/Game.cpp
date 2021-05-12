@@ -101,101 +101,31 @@ void Game::Init()
 //HRESULT res = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo("../../Assets/Textures/foil_albedo.tif").c_str(), nullptr, srvTexture.GetAddressOf());
 
 	//textures for bronze material
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_albedo.png").c_str(),
-		nullptr,
-		srvTexture1Albedo.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_normals.png").c_str(),
-		nullptr,
-		srvTexture1Normal.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_roughness.png").c_str(),
-		nullptr,
-		srvTexture1Rough.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/bronze_metal.png").c_str(),
-		nullptr,
-		srvTexture1Metal.GetAddressOf()
-	);
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/bronze_albedo.png").c_str(), nullptr, srvTexture1Albedo.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/bronze_normals.png").c_str(), nullptr, srvTexture1Normal.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/bronze_roughness.png").c_str(), nullptr, srvTexture1Rough.GetAddressOf());
+	//CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/bronze_metal.png").c_str(), nullptr, srvTexture1Metal.GetAddressOf());
 
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_albedo.tif").c_str(),
-		nullptr,
-		srvTexture2Albedo.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_normal.tif").c_str(),
-		nullptr,
-		srvTexture2Normal.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_roughness.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_roughness.tif").c_str(),
-		nullptr,
-		srvTexture2Rough.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_metalic.tif").c_str(),
-		nullptr,
-		srvTexture2Metal.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_albedo.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_albedo.tif").c_str(),
-		nullptr,
-		srvTexture3Albedo.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_normal.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_normal.tif").c_str(),
-		nullptr,
-		srvTexture3Normal.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_roughness.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_roughness.tif").c_str(),
-		nullptr,
-		srvTexture3Rough.GetAddressOf()
-	);
-	CreateWICTextureFromFile(
-		device.Get(),
-		context.Get(),
-		//GetFullPathTo_Wide(L"../../Assets/Textures/foil_metallic.tif").c_str(),
-		GetFullPathTo_Wide(L"../../Assets/Textures/planet1_metalic.tif").c_str(),
-		nullptr,
-		srvTexture3Metal.GetAddressOf()
-	);
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_albedo.tif").c_str(), nullptr, srvTexture1Albedo.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_normal.tif").c_str(), nullptr, srvTexture1Normal.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_roughness.tif").c_str(), nullptr, srvTexture1Rough.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet1/planet1_metalic.tif").c_str(), nullptr, srvTexture1Metal.GetAddressOf());
+
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_albedo.tif").c_str(), nullptr, srvTexture2Albedo.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_normal.tif").c_str(), nullptr, srvTexture2Normal.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_roughness.tif").c_str(), nullptr, srvTexture2Rough.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet2/planet2_metalic.tif").c_str(), nullptr, srvTexture2Metal.GetAddressOf());
+
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet3/planet3_albedo.tif").c_str(), nullptr, srvTexture3Albedo.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet3/planet3_normal.tif").c_str(), nullptr, srvTexture3Normal.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet3/planet3_roughness.tif").c_str(), nullptr, srvTexture3Rough.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet3/planet3_metalic.tif").c_str(), nullptr, srvTexture3Metal.GetAddressOf());
+
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet4/planet4_albedo.tif").c_str(), nullptr, srvTexture4Albedo.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet4/planet4_normal.tif").c_str(), nullptr, srvTexture4Normal.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet4/planet4_roughness.tif").c_str(), nullptr, srvTexture4Rough.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/Planet4/planet4_metalic.tif").c_str(), nullptr, srvTexture4Metal.GetAddressOf());
+	
 	CreateWICTextureFromFile(
 		device.Get(),
 		context.Get(),
@@ -400,27 +330,21 @@ void Game::CreateBasicGeometry()
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture1Albedo, sampler, srvTexture1Normal, srvTexture1Metal, srvTexture1Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture2Albedo, sampler, srvTexture2Normal, srvTexture2Metal, srvTexture2Rough));
 	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture3Albedo, sampler, srvTexture3Normal, srvTexture3Metal, srvTexture3Rough));
+	materials.push_back(std::make_shared<Material>(red, pixelShaderNormal, vertexShaderNormal, srvTexture4Albedo, sampler, srvTexture4Normal, srvTexture4Metal, srvTexture4Rough));
 	materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 	//materials.push_back(std::make_shared<Material>(white, pixelShaderNormal, vertexShaderNormal, sunEmmisive, sampler, sunNormal, sunMetal, sunRough));
 
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file
-	//entities.push_back(new Entity(meshes[1], materials[0])); //cube obj file
-	//entities.push_back(new Entity(meshes[1], materials[1])); //cube obj file
-	//entities.push_back(new Entity(meshes[2], materials[0])); //helix obj file
-	//entities.push_back(new Entity(meshes[2], materials[1])); //helix obj file
-
 	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
+	entities.push_back(new Entity(meshes[0], materials[3])); //sphere obj file
 
 
 	//give a starting position so they're not on top of each other
 	entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
 	entities[1]->GetTransform()->SetPosition(0, -1, 6);
-	/*entities[2]->GetTransform()->SetPosition(-1, -1, 0);
-	entities[3]->GetTransform()->SetPosition(1, -1, 0);
-	entities[4]->GetTransform()->SetPosition(-3, 0, 0);
-	entities[5]->GetTransform()->SetPosition(3, 0, 0);*/
 	entities[2]->GetTransform()->SetPosition(0, -1, 0);
+	entities[2]->GetTransform()->SetPosition(0, 3, 0);
 	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
 	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
 	entities[2]->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);
