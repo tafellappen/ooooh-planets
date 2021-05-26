@@ -52,7 +52,7 @@ float4 main(VertexToPixel_NormalMap input) : SV_TARGET
 	float3 finalColor =
 		CalcLightingColor(input.normal, input.worldPos, light1, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
 		CalcLightingColor(input.normal, input.worldPos, light2, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
-		CalcLightingColor(input.normal, input.worldPos, light3, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
+		//CalcLightingColor(input.normal, input.worldPos, light3, surfaceColor, camWorldPos, roughness, metalness, specularColor);  //specularExponent) +
 		(ambientColor * surfaceColor);
 
 	//return float4(light.Color, 1);
