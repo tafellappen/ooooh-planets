@@ -29,6 +29,7 @@ Emitter::Emitter(int maxParticles, int particlesPerSecond, float lifetime, float
     this->endSize = endSize;
     this->particlesPerSecond = particlesPerSecond;
     this->secondsPerParticle = 1.0f / particlesPerSecond;
+	this->emitterAcceleration = emitterAcceleration; //this is what chris said we missed
 
     //non-params
     timeSinceEmit = 0;
