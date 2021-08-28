@@ -14,7 +14,7 @@ SamplerState trilinear	: register(s0);
 // Entry point for this pixel shader
 float4 main(VertexToPixel_Particle input) : SV_TARGET
 {
-	return(1, 1, 1, 1);
+	//return(1, 1, 1, 0.25f);
 	// Sample texture and combine with input color
 	float4 color = particle.Sample(trilinear, input.uv) * input.color;
 

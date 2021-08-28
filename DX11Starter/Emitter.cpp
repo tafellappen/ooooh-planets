@@ -3,7 +3,28 @@
 
 using namespace DirectX;
 
-Emitter::Emitter(int maxParticles, int particlesPerSecond, float lifetime, float startSize, float endSize, DirectX::XMFLOAT4 startColor, DirectX::XMFLOAT4 endColor, DirectX::XMFLOAT3 startVelocity, DirectX::XMFLOAT3 velocityRandomRange, DirectX::XMFLOAT3 emitterPosition, DirectX::XMFLOAT3 positionRandomRange, DirectX::XMFLOAT4 rotationRandomRanges, DirectX::XMFLOAT3 emitterAcceleration, Microsoft::WRL::ComPtr<ID3D11Device> device, std::shared_ptr<SimpleVertexShader> vertShader, std::shared_ptr<SimplePixelShader> pixShader, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, bool isSpriteSheet, unsigned int spriteSheetWidth, unsigned int spriteSheetHeight)
+Emitter::Emitter(
+	int maxParticles, 
+	int particlesPerSecond, 
+	float lifetime, 
+	float startSize, 
+	float endSize, 
+	DirectX::XMFLOAT4 startColor, 
+	DirectX::XMFLOAT4 endColor, 
+	DirectX::XMFLOAT3 startVelocity, 
+	DirectX::XMFLOAT3 velocityRandomRange, 
+	DirectX::XMFLOAT3 emitterPosition, 
+	DirectX::XMFLOAT3 positionRandomRange, 
+	DirectX::XMFLOAT4 rotationRandomRanges, 
+	DirectX::XMFLOAT3 emitterAcceleration, 
+	Microsoft::WRL::ComPtr<ID3D11Device> device, 
+	std::shared_ptr<SimpleVertexShader> vertShader, 
+	std::shared_ptr<SimplePixelShader> pixShader, 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, 
+	bool isSpriteSheet, 
+	unsigned int spriteSheetWidth, 
+	unsigned int spriteSheetHeight
+)
 {
 	vertexShader = vertShader;
 	pixelShader = pixShader;
@@ -29,6 +50,13 @@ Emitter::Emitter(int maxParticles, int particlesPerSecond, float lifetime, float
     this->endSize = endSize;
     this->particlesPerSecond = particlesPerSecond;
     this->secondsPerParticle = 1.0f / particlesPerSecond;
+
+	//aaaand i think we missed more
+	this->velocityRandomRange = velocityRandomRange;
+	this->positionRandomRange = positionRandomRange;
+	this->rotationRandomRanges = rotationRandomRanges;
+
+	this->emitterPosition = emitterPosition;
 	this->emitterAcceleration = emitterAcceleration; //this is what chris said we missed
 
     //non-params
@@ -97,9 +125,9 @@ Emitter::Emitter(int maxParticles, int particlesPerSecond, float lifetime, float
 
 Emitter::~Emitter()
 {
-	delete particles;
+	delete[] particles;
 	particles = nullptr;
-	delete localParticleVertices;
+	delete[] localParticleVertices;
 	localParticleVertices = nullptr;
 }
 
@@ -129,6 +157,17 @@ void Emitter::Update(float dt)
 			UpdateSingleParticle(dt, i);
 		}
 
+	}
+
+
+	// Add to the time
+	timeSinceEmit += dt;
+
+	// Enough time to emit?
+	while (timeSinceEmit > secondsPerParticle)
+	{
+		SpawnParticle();
+		timeSinceEmit -= secondsPerParticle;
 	}
 }
 
