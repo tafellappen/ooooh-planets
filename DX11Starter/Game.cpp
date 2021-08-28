@@ -358,14 +358,25 @@ void Game::CreateBasicGeometry()
 
 
 	//give a starting position so they're not on top of each other
-	entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
+	/*entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
 	entities[1]->GetTransform()->SetPosition(0, -1, 6);
 	sun->GetTransform()->SetPosition(0, -1, 3);
 	entities[2]->GetTransform()->SetPosition(0, -1, 0);
 	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
 	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
-	sun->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);
+	sun->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);*/
 
+	entities[0]->GetTransform()->SetPosition(0, 0, 0);
+	entities[1]->GetTransform()->SetPosition(0, 0, 0);
+	sun->GetTransform()->SetPosition(0, 0, 0);
+	entities[2]->GetTransform()->SetPosition(0, 0, 0);
+	/*entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
+	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
+	sun->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);*/
+
+	entities[0]->GetTransform()->SetScale(1.0f, 1.0f, 1.0f);
+	entities[1]->GetTransform()->SetScale(1.0f, 1.0f, 1.0f);
+	sun->GetTransform()->SetScale(1.0f, 1.0f, 1.0f);
 
 }
 
@@ -510,9 +521,14 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 		entities[i]->GetTransform()->Rotate(0, deltaTime/(1+i), 0);
 	}
-	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 2, 0, (float)sin(totalTime) * deltaTime * 3);
-	entities[1]->GetTransform()->MoveAbsolute((float)cos(-totalTime) * deltaTime * 6, 0, (float)sin(-totalTime) * deltaTime * 5);
-	entities[2]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 4, 0, (float)sin(totalTime) * deltaTime * 3);
+
+	//entities[0]->GetTransform()->MoveRelative(0, 0, 0);
+	//entities[1]->GetTransform()->MoveRelative(0, 0, 0);
+	//entities[2]->GetTransform()->MoveRelative(0, 0, 0);
+
+	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime, 0, (float)sin(totalTime) * deltaTime);
+	entities[1]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 2, 0, (float)sin(totalTime) * deltaTime * 2);
+	entities[2]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 3, 0, (float)sin(totalTime) * deltaTime * 3);
 
 	camera->Update(deltaTime, this->hWnd);
 	emitter1->Update(deltaTime);
