@@ -731,9 +731,9 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	//}
 
-	DrawParticles();
 
 	skybox->DrawSky(context, camera);
+	DrawParticles();
 
 	// Post Processing - Post-Draw
 	// Turn OFF vertex and index buffers since we'll be using the
