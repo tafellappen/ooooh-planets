@@ -145,6 +145,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> particleDebugRasterState;
 	std::shared_ptr<SimplePixelShader> pixelShaderParticle;
 	std::shared_ptr<SimpleVertexShader> vertexShaderParticle;
+	std::shared_ptr<SimplePixelShader>  pixelShaderHybridParticle;
+	std::shared_ptr<SimpleVertexShader>  vertexShaderHybridParticle;
 	std::shared_ptr<Emitter> emitter1;
 
 

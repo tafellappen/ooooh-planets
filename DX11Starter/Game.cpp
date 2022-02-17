@@ -289,6 +289,9 @@ void Game::LoadShaders()
 
 	vertexShaderParticle = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticleVS.cso").c_str());
 	pixelShaderParticle = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"ParticlePS.cso").c_str());
+
+	vertexShaderHybridParticle = std::make_shared<SimpleVertexShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"HybridParticleVS.cso").c_str());
+	pixelShaderHybridParticle =   std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"HybridParticlePS.cso").c_str());
 	
 	emissivePS = std::make_shared<SimplePixelShader>(device.Get(), context.Get(), GetFullPathTo_Wide(L"EmissivePS.cso").c_str());
 
@@ -598,138 +601,138 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetRenderTargets(1, ppRTV.GetAddressOf(), depthStencilView.Get());
 	
 	//draw sun
-	//{
-	//	//emissivePS->SetFloat("specularExponent", sun->GetMaterial()->GetSpecularExponent());
-	//	emissivePS->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
+	{
+		//emissivePS->SetFloat("specularExponent", sun->GetMaterial()->GetSpecularExponent());
+		emissivePS->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
 
-	//	emissivePS->CopyAllBufferData();
+		emissivePS->CopyAllBufferData();
 
-	//	emissivePS->SetShaderResourceView("emissiveTexture", sun->GetMaterial()->GetTextureSRV().Get());
-	//	emissivePS->SetShaderResourceView("roughnessMap", sun->GetMaterial()->GetRoughnessSRV().Get());
-	//	emissivePS->SetShaderResourceView("mask", sun->GetMaterial()->GetMetalnessSRV().Get());
-	//	emissivePS->SetSamplerState("basicSampler", sun->GetMaterial()->GetSamplerState().Get());
+		emissivePS->SetShaderResourceView("emissiveTexture", sun->GetMaterial()->GetTextureSRV().Get());
+		emissivePS->SetShaderResourceView("roughnessMap", sun->GetMaterial()->GetRoughnessSRV().Get());
+		emissivePS->SetShaderResourceView("mask", sun->GetMaterial()->GetMetalnessSRV().Get());
+		emissivePS->SetSamplerState("basicSampler", sun->GetMaterial()->GetSamplerState().Get());
 
-	//	sun->GetMaterial()->GetVertexShader()->SetShader();
-	//	sun->GetMaterial()->GetPixelShader()->SetShader();
+		sun->GetMaterial()->GetVertexShader()->SetShader();
+		sun->GetMaterial()->GetPixelShader()->SetShader();
 
-	//	UINT stride = sizeof(Vertex);
-	//	UINT offset = 0;
-
-
-	//	std::shared_ptr<SimpleVertexShader> sunVertShader = sun->GetMaterial()->GetVertexShader();
-	//	sunVertShader->SetFloat4("colorTint", sun->GetMaterial()->GetColorTint());//do i even still need color tint
-	//	sunVertShader->SetMatrix4x4("world", sun->GetTransform()->GetWorldMatrix());
-	//	sunVertShader->SetMatrix4x4("view", camera->GetViewMatrix());
-	//	sunVertShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
-
-	//	sunVertShader->CopyAllBufferData();
-
-	//	context->IASetVertexBuffers(0, 1, sun->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	//	context->IASetIndexBuffer(sun->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-	//	context->Draw(sun->GetMesh()->GetIndexCount(), 0);
-	//}
-
-	//for (int i = 0; i < entities.size(); i++)
-	//{
-	//	bool isNormalMapped = entities[i]->GetMaterial()->GetNormalSRV() == nullptr || entities[i]->GetMaterial()->GetNormalSRV() == NULL;
-	//	if (isNormalMapped) //is there a better way to check than nullptr?
-	//	{
-	//		pixelShader->SetFloat3("ambientColor", ambientColor);
-	//		pixelShader->SetFloat("specularExponent", entities[i]->GetMaterial()->GetSpecularExponent());
-	//		pixelShader->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
-
-	//		pixelShader->CopyAllBufferData();
-
-	//		//this is not part of the buffer data because it is not directly conected to the pipeline
-	//		//pixelShader->SetShaderResourceView("diffuseTexture", srvTexture1Diffuse.Get());
-	//		pixelShader->SetShaderResourceView("albedoTexture", entities[i]->GetMaterial()->GetTextureSRV().Get());
-	//		pixelShader->SetShaderResourceView("roughnessMap", entities[i]->GetMaterial()->GetRoughnessSRV().Get());
-	//		pixelShader->SetShaderResourceView("metalnessMap", entities[i]->GetMaterial()->GetMetalnessSRV().Get());
-
-	//		pixelShader->SetSamplerState("basicSampler", entities[i]->GetMaterial()->GetSamplerState().Get());
-	//	}
-	//	else
-	//	{
-	//		pixelShaderNormal->SetFloat3("ambientColor", ambientColor);
-	//		pixelShaderNormal->SetFloat("specularExponent", entities[i]->GetMaterial()->GetSpecularExponent());
-	//		pixelShaderNormal->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
-	//		
-	//		pixelShaderNormal->CopyAllBufferData();
-
-	//		pixelShaderNormal->SetShaderResourceView("albedoTexture", entities[i]->GetMaterial()->GetTextureSRV().Get());
-	//		//pixelShaderNormal->SetShaderResourceView("normalMap", srvTexture1Normal.Get());
-	//		pixelShaderNormal->SetShaderResourceView("normalMap", entities[i]->GetMaterial()->GetNormalSRV().Get());
-	//		pixelShader->SetShaderResourceView("roughnessMap", entities[i]->GetMaterial()->GetRoughnessSRV().Get());
-	//		pixelShader->SetShaderResourceView("metalnessMap", entities[i]->GetMaterial()->GetMetalnessSRV().Get());
-	//		pixelShaderNormal->SetSamplerState("basicSampler", entities[i]->GetMaterial()->GetSamplerState().Get());
-
-	//	}
-
-	//	entities[i]->GetMaterial()->GetVertexShader()->SetShader();
-	//	entities[i]->GetMaterial()->GetPixelShader()->SetShader();
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
 
 
+		std::shared_ptr<SimpleVertexShader> sunVertShader = sun->GetMaterial()->GetVertexShader();
+		sunVertShader->SetFloat4("colorTint", sun->GetMaterial()->GetColorTint());//do i even still need color tint
+		sunVertShader->SetMatrix4x4("world", sun->GetTransform()->GetWorldMatrix());
+		sunVertShader->SetMatrix4x4("view", camera->GetViewMatrix());
+		sunVertShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+		sunVertShader->CopyAllBufferData();
+
+		context->IASetVertexBuffers(0, 1, sun->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(sun->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+		context->Draw(sun->GetMesh()->GetIndexCount(), 0);
+	}
+
+	for (int i = 0; i < entities.size(); i++)
+	{
+		bool isNormalMapped = entities[i]->GetMaterial()->GetNormalSRV() == nullptr || entities[i]->GetMaterial()->GetNormalSRV() == NULL;
+		if (isNormalMapped) //is there a better way to check than nullptr?
+		{
+			pixelShader->SetFloat3("ambientColor", ambientColor);
+			pixelShader->SetFloat("specularExponent", entities[i]->GetMaterial()->GetSpecularExponent());
+			pixelShader->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
+
+			pixelShader->CopyAllBufferData();
+
+			//this is not part of the buffer data because it is not directly conected to the pipeline
+			//pixelShader->SetShaderResourceView("diffuseTexture", srvTexture1Diffuse.Get());
+			pixelShader->SetShaderResourceView("albedoTexture", entities[i]->GetMaterial()->GetTextureSRV().Get());
+			pixelShader->SetShaderResourceView("roughnessMap", entities[i]->GetMaterial()->GetRoughnessSRV().Get());
+			pixelShader->SetShaderResourceView("metalnessMap", entities[i]->GetMaterial()->GetMetalnessSRV().Get());
+
+			pixelShader->SetSamplerState("basicSampler", entities[i]->GetMaterial()->GetSamplerState().Get());
+		}
+		else
+		{
+			pixelShaderNormal->SetFloat3("ambientColor", ambientColor);
+			pixelShaderNormal->SetFloat("specularExponent", entities[i]->GetMaterial()->GetSpecularExponent());
+			pixelShaderNormal->SetFloat3("camWorldPos", camera->GetTransform()->GetPosition());
+			
+			pixelShaderNormal->CopyAllBufferData();
+
+			pixelShaderNormal->SetShaderResourceView("albedoTexture", entities[i]->GetMaterial()->GetTextureSRV().Get());
+			//pixelShaderNormal->SetShaderResourceView("normalMap", srvTexture1Normal.Get());
+			pixelShaderNormal->SetShaderResourceView("normalMap", entities[i]->GetMaterial()->GetNormalSRV().Get());
+			pixelShader->SetShaderResourceView("roughnessMap", entities[i]->GetMaterial()->GetRoughnessSRV().Get());
+			pixelShader->SetShaderResourceView("metalnessMap", entities[i]->GetMaterial()->GetMetalnessSRV().Get());
+			pixelShaderNormal->SetSamplerState("basicSampler", entities[i]->GetMaterial()->GetSamplerState().Get());
+
+		}
+
+		entities[i]->GetMaterial()->GetVertexShader()->SetShader();
+		entities[i]->GetMaterial()->GetPixelShader()->SetShader();
 
 
 
 
-	//	// Ensure the pipeline knows how to interpret the data (numbers)
-	//	// from the vertex buffer.  
-	//	// - If all of your 3D models use the exact same vertex layout,
-	//	//    this could simply be done once in Init()
-	//	// - However, this isn't always the case (but might be for this course)
-	//	//context->IASetInputLayout(inputLayout.Get());
 
 
-	//	// Set buffers in the input assembler
-	//	//  - Do this ONCE PER OBJECT you're drawing, since each object might
-	//	//    have different geometry.
-	//	//  - for this demo, this step *could* simply be done once during Init(),
-	//	//    but I'm doing it here because it's often done multiple times per frame
-	//	//    in a larger application/game
-	//	UINT stride = sizeof(Vertex);
-	//	UINT offset = 0;
-	//	/*context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	//	context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);*/
-
-	//	std::shared_ptr<SimpleVertexShader> vertShader = entities[i]->GetMaterial()->GetVertexShader();
-	//	vertShader->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());//do i even still need color tint
-	//	vertShader->SetMatrix4x4("world", entities[i]->GetTransform()->GetWorldMatrix());
-	//	vertShader->SetMatrix4x4("view", camera->GetViewMatrix());
-	//	vertShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
-
-	//	vertShader->CopyAllBufferData();
-	//	//D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	//	//context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-
-	//	//memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-
-	//	//context->Unmap(constantBufferVS.Get(), 0);
-	//	//context->VSSetConstantBuffers(
-	//	//0,
-	//	//1,
-	//	//constantBufferVS.GetAddressOf());
-
-	//	///*context->IASetVertexBuffers(0, 1, meshes[i]->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	//	//context->IASetIndexBuffer(meshes[i]->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);*/
-	//	//vsData.worldMatrix = entities[i]->GetTransform()->GetWorldMatrix();//->Rotate(4, 0, 0);
-	//	context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	//	context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+		// Ensure the pipeline knows how to interpret the data (numbers)
+		// from the vertex buffer.  
+		// - If all of your 3D models use the exact same vertex layout,
+		//    this could simply be done once in Init()
+		// - However, this isn't always the case (but might be for this course)
+		//context->IASetInputLayout(inputLayout.Get());
 
 
+		// Set buffers in the input assembler
+		//  - Do this ONCE PER OBJECT you're drawing, since each object might
+		//    have different geometry.
+		//  - for this demo, this step *could* simply be done once during Init(),
+		//    but I'm doing it here because it's often done multiple times per frame
+		//    in a larger application/game
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		/*context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);*/
 
-	//	// Finally do the actual drawing
-	//	//  - Do this ONCE PER OBJECT you intend to draw
-	//	//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-	//	//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-	//	//     vertices in the currently set VERTEX BUFFER
-	//	context->DrawIndexed(
-	//		entities[i]->GetMesh()->GetIndexCount(),//meshes[i]->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
-	//		0,     // Offset to the first index we want to use
-	//		0);    // Offset to add to each index when looking up vertices
+		std::shared_ptr<SimpleVertexShader> vertShader = entities[i]->GetMaterial()->GetVertexShader();
+		vertShader->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());//do i even still need color tint
+		vertShader->SetMatrix4x4("world", entities[i]->GetTransform()->GetWorldMatrix());
+		vertShader->SetMatrix4x4("view", camera->GetViewMatrix());
+		vertShader->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+		vertShader->CopyAllBufferData();
+		//D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+		//context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+		//memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+		//context->Unmap(constantBufferVS.Get(), 0);
+		//context->VSSetConstantBuffers(
+		//0,
+		//1,
+		//constantBufferVS.GetAddressOf());
+
+		///*context->IASetVertexBuffers(0, 1, meshes[i]->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		//context->IASetIndexBuffer(meshes[i]->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);*/
+		//vsData.worldMatrix = entities[i]->GetTransform()->GetWorldMatrix();//->Rotate(4, 0, 0);
+		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
 
-	//}
+
+		// Finally do the actual drawing
+		//  - Do this ONCE PER OBJECT you intend to draw
+		//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
+		//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
+		//     vertices in the currently set VERTEX BUFFER
+		context->DrawIndexed(
+			entities[i]->GetMesh()->GetIndexCount(),//meshes[i]->GetIndexCount(),     // The number of indices to use (we could draw a subset if we wanted)
+			0,     // Offset to the first index we want to use
+			0);    // Offset to add to each index when looking up vertices
+
+
+	}
 
 
 	skybox->DrawSky(context, camera);
