@@ -41,7 +41,7 @@ float4 main(VertexToPixel_NormalMap input) : SV_TARGET
 	//return float4(unpackedNormal, 1);
 
 	input.normal = normalize(mul(unpackedNormal, TBN));
-
+	//return input.worldPos.xyzz;
 	//---PBR Stuff---
 	float roughness = roughnessMap.Sample(basicSampler, input.uv).r;
 	float metalness = metalnessMap.Sample(basicSampler, input.uv).r;
@@ -50,8 +50,8 @@ float4 main(VertexToPixel_NormalMap input) : SV_TARGET
 
 
 	float3 finalColor =
-		CalcLightingColor(input.normal, input.worldPos, light1, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
-		CalcLightingColor(input.normal, input.worldPos, light2, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
+		//CalcLightingColor(input.normal, input.worldPos, light1, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
+		//CalcLightingColor(input.normal, input.worldPos, light2, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
 		CalcLightingColor(input.normal, input.worldPos, light3, surfaceColor, camWorldPos, roughness, metalness, specularColor) + //specularExponent) +
 		(ambientColor * surfaceColor);
 

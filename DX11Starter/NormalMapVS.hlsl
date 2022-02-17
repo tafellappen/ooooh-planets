@@ -41,7 +41,7 @@ VertexToPixel_NormalMap main( VertexShaderInput input )
 	output.tangent = mul((float3x3)world, input.tangent);
 
 	//for point lights - get the worldspace position of this vertex
-	output.worldPos = mul(input.position, world);
+	output.worldPos = mul(world, float4(input.position, 1.0f)).xyz;
 
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)
