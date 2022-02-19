@@ -41,7 +41,7 @@ float4 main(VertexToPixel_NormalMap input) : SV_TARGET
 	//return float4(unpackedNormal, 1);
 
 	input.normal = normalize(mul(unpackedNormal, TBN));
-
+	//return input.worldPos.xyzz;
 	//---PBR Stuff---
 	float roughness = roughnessMap.Sample(basicSampler, input.uv).r;
 	float metalness = metalnessMap.Sample(basicSampler, input.uv).r;
