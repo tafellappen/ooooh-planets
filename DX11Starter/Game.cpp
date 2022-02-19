@@ -239,7 +239,7 @@ void Game::Init()
 	XMFLOAT3 white = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	lights.push_back({
-		0,
+		1,
 		green,
 		0.0f,
 		XMFLOAT3(1.0f, -1.0f, 0.0f)
@@ -263,8 +263,9 @@ void Game::Init()
 	lights.push_back({
 		1,
 		white,
-		30.0f,
+		2.0f,
 		XMFLOAT3(0.0f, 0.0f, 0.0f)
+		//XMFLOAT3(2.0f, 2.0f, 2.0f)
 		});
 
 
@@ -363,7 +364,8 @@ void Game::CreateBasicGeometry()
 	//give a starting position so they're not on top of each other
 	entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
 	entities[1]->GetTransform()->SetPosition(0, -1, 6);
-	sun->GetTransform()->SetPosition(0, -1, 3);
+	sun->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
+	//sun->GetTransform()->SetPosition(2.0f, 2.0f, 2.0f);
 	entities[2]->GetTransform()->SetPosition(0, -1, 0);
 	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
 	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
