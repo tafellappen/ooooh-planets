@@ -433,6 +433,10 @@ void Game::ParticleSetup()
 		particleTexture);
 }
 
+void Game::HybridEmitterSetup()
+{
+}
+
 void Game::ResizeAllPostProcessResources()
 {
 	ResizeOnePostProcessResource(ppRTV, ppSRV, 1.0f);

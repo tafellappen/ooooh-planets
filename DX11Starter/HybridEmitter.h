@@ -19,12 +19,12 @@ struct ParticleData
 	//DirectX::XMFLOAT3 StartVelocity;
 };
 
-class Emitter
+class HybridEmitter
 {
 public:
 	//std::shared_ptr<SimpleVertexShader> vs,
 	//std::shared_ptr<SimplePixelShader> ps,
-	Emitter(
+	HybridEmitter(
 		float particlesEmitPerSec,
 		float particleLifetime,
 		float maxParticles,
@@ -35,7 +35,7 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
 	);
-	~Emitter();
+	~HybridEmitter();
 
 	void Update(float dt, float currentTime);
 	void Draw(Camera* camera, float currentTime);

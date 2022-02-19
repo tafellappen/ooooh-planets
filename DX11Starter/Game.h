@@ -12,6 +12,7 @@
 #include "Lights.h"
 #include "Sky.h"
 #include "Emitter.h"
+#include "HybridEmitter.h"
 #include "WICTextureLoader.h"
 #include <vector>
 class Game 
@@ -38,6 +39,8 @@ private:
 	void CreateBasicGeometry();
 
 	void ParticleSetup();
+	void HybridEmitterSetup();
+
 	void ResizeAllPostProcessResources();
 	void ResizeOnePostProcessResource(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtv, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, float renderTargetScale = 1.0f);
 

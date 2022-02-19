@@ -1,6 +1,6 @@
 #include "HybridEmitter.h"
 
-Emitter::Emitter(
+HybridEmitter::HybridEmitter(
 	float particlesEmitPerSec,
 	float particleLifetime,
 	float maxParticles,
@@ -78,14 +78,14 @@ Emitter::Emitter(
 
 }
 
-Emitter::~Emitter()
+HybridEmitter::~HybridEmitter()
 {
 	delete[] particles;
 	//delete vs; //i guess my asset manager already cleans these up, so i dont need these here?
 	//delete ps;
 }
 
-void Emitter::Update(float dt, float currentTime)
+void HybridEmitter::Update(float dt, float currentTime)
 {
 	//"first" as in the first one you would get to as the index counts up
 	//this would also make "first" living the "oldest" living particle
@@ -164,7 +164,7 @@ void Emitter::Update(float dt, float currentTime)
 	//std::cout << "firstLiving: " << firstLivingIndex << std::endl;
 }
 
-void Emitter::Draw(Camera* camera, float currentTime)
+void HybridEmitter::Draw(Camera* camera, float currentTime)
 {
 	UINT stride = 0;
 	UINT offset = 0;
@@ -194,18 +194,18 @@ void Emitter::Draw(Camera* camera, float currentTime)
 
 }
 
-std::shared_ptr<Transform> Emitter::GetTransform()
+std::shared_ptr<Transform> HybridEmitter::GetTransform()
 {
 	return transform;
 }
 
-void Emitter::SetRectBounds(float x, float y, float z)
+void HybridEmitter::SetRectBounds(float x, float y, float z)
 {
 	emissionRectDimensions = DirectX::XMFLOAT3(x, y, z);
 	emitFromPoint = false;
 }
 
-void Emitter::EmitParticle(float emitTime)
+void HybridEmitter::EmitParticle(float emitTime)
 {
 	if (livingCount >= maxParticles) //dont spawn more if its reached the max
 		return;
@@ -219,7 +219,7 @@ void Emitter::EmitParticle(float emitTime)
 	}
 	else
 	{
-		//i will be lazy and not center it around the emitter transform
+		//i will be lazy and not center it around the HybridEmitter transform
 		float x = rand() / (float)RAND_MAX * emissionRectDimensions.x;
 		float y = rand() / (float)RAND_MAX * emissionRectDimensions.y;
 		float z = rand() / (float)RAND_MAX * emissionRectDimensions.z;
@@ -240,7 +240,7 @@ void Emitter::EmitParticle(float emitTime)
 	livingCount++;
 }
 
-void Emitter::UpdateSingleParticle(float currentTime, int index)
+void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 {
 	float age = currentTime - particles[index].EmitTime;
 
