@@ -239,7 +239,7 @@ void Game::Init()
 	XMFLOAT3 white = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	lights.push_back({
-		0,
+		1,
 		green,
 		0.0f,
 		XMFLOAT3(1.0f, -1.0f, 0.0f)
