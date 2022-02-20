@@ -5,10 +5,12 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
+#include <wrl/client.h>
 
 #include <unordered_map>
 #include <vector>
 #include <string>
+
 
 // --------------------------------------------------------
 // Used by simple shaders to store information about
@@ -30,9 +32,9 @@ struct SimpleConstantBuffer
 {
 	std::string Name;
 	D3D_CBUFFER_TYPE Type = D3D_CBUFFER_TYPE::D3D11_CT_CBUFFER;
-	unsigned int Size;
-	unsigned int BindIndex;
-	ID3D11Buffer* ConstantBuffer = 0;
+	unsigned int Size = 0;
+	unsigned int BindIndex = 0;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> ConstantBuffer = 0;
 	unsigned char* LocalDataBuffer = 0;
 	std::vector<SimpleShaderVariable> Variables;
 };
@@ -61,7 +63,7 @@ struct SimpleSampler
 class ISimpleShader
 {
 public:
-	ISimpleShader(ID3D11Device* device, ID3D11DeviceContext* context);
+	ISimpleShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 	virtual ~ISimpleShader();
 
 	// Simple helpers
@@ -88,16 +90,21 @@ public:
 	bool SetMatrix4x4(std::string name, const DirectX::XMFLOAT4X4 data);
 
 	// Setting shader resources
-	virtual bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv) = 0;
-	virtual bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState) = 0;
+	virtual bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv) = 0;
+	virtual bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState) = 0;
+
+	// Simple resource checking
+	bool HasVariable(std::string name);
+	bool HasShaderResourceView(std::string name);
+	bool HasSamplerState(std::string name);
 
 	// Getting data about variables and resources
 	const SimpleShaderVariable* GetVariableInfo(std::string name);
-	
+
 	const SimpleSRV* GetShaderResourceViewInfo(std::string name);
 	const SimpleSRV* GetShaderResourceViewInfo(unsigned int index);
 	size_t GetShaderResourceViewCount() { return textureTable.size(); }
-	
+
 	const SimpleSampler* GetSamplerInfo(std::string name);
 	const SimpleSampler* GetSamplerInfo(unsigned int index);
 	size_t GetSamplerCount() { return samplerTable.size(); }
@@ -107,22 +114,26 @@ public:
 	unsigned int GetBufferSize(unsigned int index);
 	const SimpleConstantBuffer* GetBufferInfo(std::string name);
 	const SimpleConstantBuffer* GetBufferInfo(unsigned int index);
-	
+
 	// Misc getters
-	ID3DBlob* GetShaderBlob() { return shaderBlob; }
+	Microsoft::WRL::ComPtr<ID3DBlob> GetShaderBlob() { return shaderBlob; }
+
+	// Error reporting
+	static bool ReportErrors;
+	static bool ReportWarnings;
 
 protected:
-	
+
 	bool shaderValid;
-	ID3DBlob* shaderBlob;
-	ID3D11Device* device;
-	ID3D11DeviceContext* deviceContext;
+	Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob;
+	Microsoft::WRL::ComPtr<ID3D11Device> device;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
 
 	// Resource counts
 	unsigned int constantBufferCount;
-	
+
 	// Maps for variables and buffers
-	SimpleConstantBuffer*		constantBuffers; // For index-based lookup
+	SimpleConstantBuffer* constantBuffers; // For index-based lookup
 	std::vector<SimpleSRV*>		shaderResourceViews;
 	std::vector<SimpleSampler*>	samplerStates;
 	std::unordered_map<std::string, SimpleConstantBuffer*> cbTable;
@@ -134,7 +145,7 @@ protected:
 	bool LoadShaderFile(LPCWSTR shaderFile);
 
 	// Pure virtual functions for dealing with shader types
-	virtual bool CreateShader(ID3DBlob* shaderBlob) = 0;
+	virtual bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob) = 0;
 	virtual void SetShaderAndCBs() = 0;
 
 	virtual void CleanUp();
@@ -142,6 +153,16 @@ protected:
 	// Helpers for finding data by name
 	SimpleShaderVariable* FindVariable(std::string name, int size);
 	SimpleConstantBuffer* FindConstantBuffer(std::string name);
+
+	// Error logging
+	void Log(std::string message, WORD color);
+	void LogW(std::wstring message, WORD color);
+	void Log(std::string message);
+	void LogW(std::wstring message);
+	void LogError(std::string message);
+	void LogErrorW(std::wstring message);
+	void LogWarning(std::string message);
+	void LogWarningW(std::wstring message);
 };
 
 // --------------------------------------------------------
@@ -150,21 +171,21 @@ protected:
 class SimpleVertexShader : public ISimpleShader
 {
 public:
-	SimpleVertexShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile);
-	SimpleVertexShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile, ID3D11InputLayout* inputLayout, bool perInstanceCompatible);
+	SimpleVertexShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile);
+	SimpleVertexShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile, Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout, bool perInstanceCompatible);
 	~SimpleVertexShader();
-	ID3D11VertexShader* GetDirectXShader() { return shader; }
-	ID3D11InputLayout* GetInputLayout() { return inputLayout; }
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> GetInputLayout() { return inputLayout; }
 	bool GetPerInstanceCompatible() { return perInstanceCompatible; }
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 
 protected:
 	bool perInstanceCompatible;
-	ID3D11InputLayout* inputLayout;
-	ID3D11VertexShader* shader;
-	bool CreateShader(ID3DBlob* shaderBlob);
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> shader;
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 };
@@ -176,16 +197,16 @@ protected:
 class SimplePixelShader : public ISimpleShader
 {
 public:
-	SimplePixelShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile);
+	SimplePixelShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile);
 	~SimplePixelShader();
-	ID3D11PixelShader* GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> GetDirectXShader() { return shader; }
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 
 protected:
-	ID3D11PixelShader* shader;
-	bool CreateShader(ID3DBlob* shaderBlob);
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> shader;
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 };
@@ -196,16 +217,16 @@ protected:
 class SimpleDomainShader : public ISimpleShader
 {
 public:
-	SimpleDomainShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile);
+	SimpleDomainShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile);
 	~SimpleDomainShader();
-	ID3D11DomainShader* GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11DomainShader> GetDirectXShader() { return shader; }
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 
 protected:
-	ID3D11DomainShader* shader;
-	bool CreateShader(ID3DBlob* shaderBlob);
+	Microsoft::WRL::ComPtr<ID3D11DomainShader> shader;
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 };
@@ -216,16 +237,16 @@ protected:
 class SimpleHullShader : public ISimpleShader
 {
 public:
-	SimpleHullShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile);
+	SimpleHullShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile);
 	~SimpleHullShader();
-	ID3D11HullShader* GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11HullShader> GetDirectXShader() { return shader; }
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 
 protected:
-	ID3D11HullShader* shader;
-	bool CreateShader(ID3DBlob* shaderBlob);
+	Microsoft::WRL::ComPtr<ID3D11HullShader> shader;
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 };
@@ -236,28 +257,28 @@ protected:
 class SimpleGeometryShader : public ISimpleShader
 {
 public:
-	SimpleGeometryShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile, bool useStreamOut = 0, bool allowStreamOutRasterization = 0);
+	SimpleGeometryShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile, bool useStreamOut = 0, bool allowStreamOutRasterization = 0);
 	~SimpleGeometryShader();
-	ID3D11GeometryShader* GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11GeometryShader> GetDirectXShader() { return shader; }
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
 
-	bool CreateCompatibleStreamOutBuffer(ID3D11Buffer** buffer, int vertexCount);
+	bool CreateCompatibleStreamOutBuffer(Microsoft::WRL::ComPtr<ID3D11Buffer> buffer, int vertexCount);
 
-	static void UnbindStreamOutStage(ID3D11DeviceContext* deviceContext);
+	static void UnbindStreamOutStage(Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 
 protected:
 	// Shader itself
-	ID3D11GeometryShader* shader;
+	Microsoft::WRL::ComPtr<ID3D11GeometryShader> shader;
 
 	// Stream out related
 	bool useStreamOut;
 	bool allowStreamOutRasterization;
 	unsigned int streamOutVertexSize;
 
-	bool CreateShader(ID3DBlob* shaderBlob);
-	bool CreateShaderWithStreamOut(ID3DBlob* shaderBlob);
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
+	bool CreateShaderWithStreamOut(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 
@@ -272,21 +293,23 @@ protected:
 class SimpleComputeShader : public ISimpleShader
 {
 public:
-	SimpleComputeShader(ID3D11Device* device, ID3D11DeviceContext* context, LPCWSTR shaderFile);
+	SimpleComputeShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, LPCWSTR shaderFile);
 	~SimpleComputeShader();
-	ID3D11ComputeShader* GetDirectXShader() { return shader; }
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> GetDirectXShader() { return shader; }
 
 	void DispatchByGroups(unsigned int groupsX, unsigned int groupsY, unsigned int groupsZ);
 	void DispatchByThreads(unsigned int threadsX, unsigned int threadsY, unsigned int threadsZ);
 
-	bool SetShaderResourceView(std::string name, ID3D11ShaderResourceView* srv);
-	bool SetSamplerState(std::string name, ID3D11SamplerState* samplerState);
-	bool SetUnorderedAccessView(std::string name, ID3D11UnorderedAccessView* uav, unsigned int appendConsumeOffset = -1);
+	bool HasUnorderedAccessView(std::string name);
+
+	bool SetShaderResourceView(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv);
+	bool SetSamplerState(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState);
+	bool SetUnorderedAccessView(std::string name, Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> uav, unsigned int appendConsumeOffset = -1);
 
 	int GetUnorderedAccessViewIndex(std::string name);
 
 protected:
-	ID3D11ComputeShader* shader;
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> shader;
 	std::unordered_map<std::string, unsigned int> uavTable;
 
 	unsigned int threadsX;
@@ -294,7 +317,7 @@ protected:
 	unsigned int threadsZ;
 	unsigned int threadsTotal;
 
-	bool CreateShader(ID3DBlob* shaderBlob);
+	bool CreateShader(Microsoft::WRL::ComPtr<ID3DBlob> shaderBlob);
 	void SetShaderAndCBs();
 	void CleanUp();
 };
