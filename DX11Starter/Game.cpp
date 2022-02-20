@@ -263,8 +263,9 @@ void Game::Init()
 	lights.push_back({
 		1,
 		white,
-		30.0f,
+		2.0f,
 		XMFLOAT3(0.0f, 0.0f, 0.0f)
+		//XMFLOAT3(2.0f, 2.0f, 2.0f)
 		});
 
 
@@ -360,7 +361,8 @@ void Game::CreateBasicGeometry()
 	//give a starting position so they're not on top of each other
 	/*entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
 	entities[1]->GetTransform()->SetPosition(0, -1, 6);
-	sun->GetTransform()->SetPosition(0, -1, 3);
+	sun->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
+	//sun->GetTransform()->SetPosition(2.0f, 2.0f, 2.0f);
 	entities[2]->GetTransform()->SetPosition(0, -1, 0);
 	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
 	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
@@ -437,7 +439,7 @@ void Game::ParticleSetup()
 		XMFLOAT4(1, 0.6f, 0.1f, 0),		// End color
 		XMFLOAT3(-2, 2, 0),				// Start velocity
 		XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
-		XMFLOAT3(2, 0, 0),				// Emitter position
+		XMFLOAT3(0, 0, 0),				// Emitter position
 		XMFLOAT3(0.1f, 0.1f, 0.1f),		// Position randomness range
 		XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
 		XMFLOAT3(0, -1, 0),				// Constant acceleration
@@ -756,9 +758,9 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	}
 
-	DrawParticles();
 
 	skybox->DrawSky(context, camera);
+	DrawParticles();
 
 	// Post Processing - Post-Draw
 	// Turn OFF vertex and index buffers since we'll be using the

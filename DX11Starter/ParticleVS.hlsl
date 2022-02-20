@@ -3,8 +3,8 @@
 
 cbuffer ExternalData : register(b0)
 {
-	float4 colorTint;
-	matrix world;
+	/*float4 colorTint;
+	matrix world;*/
 
 	matrix view;
 	matrix projection;
@@ -27,7 +27,7 @@ VertexToPixel_Particle main(VertexShaderInput_Particle input)
 	//calculate output position
 	matrix viewProj = mul(projection, view);
 	output.position = mul(viewProj, float4(input.position, 1.0f));
-	output.position = float4(0, 0, 0, 0);
+	//output.position = float4(0, 0, 0, 0);
 
 	//pass uv
 	output.uv = input.uv;
