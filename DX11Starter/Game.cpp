@@ -193,6 +193,7 @@ void Game::Init()
 	LoadShaders();
 	CreateBasicGeometry();
 	ParticleSetup();
+	HybridEmitterSetup();
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -435,6 +436,15 @@ void Game::ParticleSetup()
 
 void Game::HybridEmitterSetup()
 {
+	//get the texture
+	std::wstring particleTexPath = GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str();
+	HRESULT r = CreateWICTextureFromFile(
+		device.Get(),
+		context.Get(),
+		GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(),
+		0, particleTexture.GetAddressOf());
+
+	hEmitter1 = std::make_shared<HybridEmitter>(2, 10, 500, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShaderHybridParticle.get(), pixelShaderHybridParticle.get(), device, context, particleTexture);
 }
 
 void Game::ResizeAllPostProcessResources()
@@ -525,6 +535,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	camera->Update(deltaTime, this->hWnd);
 	emitter1->Update(deltaTime);
+	hEmitter1->Update(deltaTime, totalTime);
 }
 //
 //void Game::CreateLights()
@@ -742,7 +753,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 
 	skybox->DrawSky(context, camera);
-	DrawParticles();
+	DrawParticles(deltaTime, totalTime);
 
 	// Post Processing - Post-Draw
 	// Turn OFF vertex and index buffers since we'll be using the
@@ -796,7 +807,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->OMSetRenderTargets(1, backBufferRTV.GetAddressOf(), depthStencilView.Get());
 }
 
-void Game::DrawParticles()
+void Game::DrawParticles(float deltaTime, float totalTime)
 {
 	//particle drawing-----
 // Particle states
@@ -809,44 +820,15 @@ void Game::DrawParticles()
 
 	//draw emitters
 	emitter1->Draw(context, camera);
+	hEmitter1->Draw(camera.get(), totalTime);
 
 	// Reset to default states for next frame
 	context->OMSetBlendState(0, 0, 0xffffffff);
 	context->OMSetDepthStencilState(0, 0);
 	context->RSSetState(0);
 
-	////change to sky-specific rasterizer state
-	//context->RSSetState(skybox->GetRasterizerOptions().Get());
-
-	////set sky shaders
-	///*skyVS->SetShader();
-	//skyPS->SetShader();*/
-	//std::shared_ptr<SimpleVertexShader> vertShad = skybox->GetVertexShader();
-	//std::shared_ptr<SimplePixelShader> pixShad = skybox->GetPixelShader();
-	//vertShad->SetShader();
-	//pixShad->SetShader();
-
-	////XMMATRIX centerBoxOnCamera
-
-	////give proper data
-	//vertShad->SetMatrix4x4("view", camera->GetViewMatrix());
-	//vertShad->SetMatrix4x4("projection", camera->GetViewMatrix());
-
-	////set mesh buffers and draw
-	////skyMesh->SetBuffersAndDraw(context); //not yet an existing method
-	//// Set buffers in the input assembler
-	//UINT stride = sizeof(Vertex);
-	//UINT offset = 0;
-	//context->IASetVertexBuffers(0, 1, skybox->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
-	//context->IASetIndexBuffer(skybox->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	//// Draw this mesh
-	//context->DrawIndexed(skybox->GetMesh()->GetIndexCount(), 0, 0);
-
-	////reset back to default
-	//context->RSSetState(0); // null or 0 puts back the defaults
-
 }
+
 
 void Game::BloomExtract()
 {

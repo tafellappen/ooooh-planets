@@ -44,7 +44,7 @@ private:
 	void ResizeAllPostProcessResources();
 	void ResizeOnePostProcessResource(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtv, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, float renderTargetScale = 1.0f);
 
-	void DrawParticles();
+	void DrawParticles(float deltaTime, float totalTime);
 
 	void BloomExtract();
 	void SingleDirectionBlur(
@@ -151,6 +151,7 @@ private:
 	std::shared_ptr<SimplePixelShader>  pixelShaderHybridParticle;
 	std::shared_ptr<SimpleVertexShader>  vertexShaderHybridParticle;
 	std::shared_ptr<Emitter> emitter1;
+	std::shared_ptr<HybridEmitter> hEmitter1;
 
 
 
