@@ -12,6 +12,7 @@
 #include "Lights.h"
 #include "Sky.h"
 #include "Emitter.h"
+#include "HybridEmitter.h"
 #include "WICTextureLoader.h"
 #include <vector>
 class Game 
@@ -38,10 +39,12 @@ private:
 	void CreateBasicGeometry();
 
 	void ParticleSetup();
+	void HybridEmitterSetup();
+
 	void ResizeAllPostProcessResources();
 	void ResizeOnePostProcessResource(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtv, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, float renderTargetScale = 1.0f);
 
-	void DrawParticles();
+	void DrawParticles(float deltaTime, float totalTime);
 
 	void BloomExtract();
 	void SingleDirectionBlur(
@@ -145,7 +148,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> particleDebugRasterState;
 	std::shared_ptr<SimplePixelShader> pixelShaderParticle;
 	std::shared_ptr<SimpleVertexShader> vertexShaderParticle;
+	std::shared_ptr<SimplePixelShader>  pixelShaderHybridParticle;
+	std::shared_ptr<SimpleVertexShader>  vertexShaderHybridParticle;
 	std::shared_ptr<Emitter> emitter1;
+	std::shared_ptr<HybridEmitter> hEmitter1;
 
 
 
