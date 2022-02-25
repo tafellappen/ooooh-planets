@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ComputeShaderEmitter.cpp" />
     <ClCompile Include="DXCore.cpp" />
     <ClCompile Include="Emitter.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -139,6 +140,7 @@
   <ItemGroup>
     <ClInclude Include="BufferStructs.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComputeShaderEmitter.h" />
     <ClInclude Include="DXCore.h" />
     <ClInclude Include="Emitter.h" />
     <ClInclude Include="Entity.h" />

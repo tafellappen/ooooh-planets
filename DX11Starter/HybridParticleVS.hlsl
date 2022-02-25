@@ -11,6 +11,7 @@ struct Particle
 	float EmitTime;
 	float3 StartPosition;
 	//float3 StartVelocity;
+
 };
 
 // structured buffer of particle data
@@ -56,6 +57,7 @@ VertexToPixel main(uint id : SV_VertexID)
 	float3 pos = p.StartPosition;
 	//we will cheat and use the start position for a little motion variance
 	pos += float3(0.7f, 0.5, p.StartPosition.x) * age;
+	//float accel = 1; //temporary
 	//pos = accel * age * age / 2.0f + p.StartVelocity * age + p.StartPosition;
 
 	// Offsets for the 4 corners of a quad - we'll only

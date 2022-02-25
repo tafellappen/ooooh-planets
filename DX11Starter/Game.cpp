@@ -445,6 +445,7 @@ void Game::HybridEmitterSetup()
 		0, particleTexture.GetAddressOf());
 
 	hEmitter1 = std::make_shared<HybridEmitter>(2, 10, 500, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShaderHybridParticle.get(), pixelShaderHybridParticle.get(), device, context, particleTexture);
+	hEmitter1->SetRectBounds(3.0f, 3.0f, 3.0f);
 }
 
 void Game::ResizeAllPostProcessResources()
