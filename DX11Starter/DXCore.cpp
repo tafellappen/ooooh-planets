@@ -1,4 +1,5 @@
 #include "DXCore.h"
+#include "imgui/imgui.h"
 
 #include <WindowsX.h>
 #include <sstream>
@@ -640,6 +641,11 @@ LRESULT DXCore::ProcessMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_GETMINMAXINFO:
 		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+		return 0;
+
+	// Has a kwy been pressed?
+	case WM_CHAR:
+		ImGui::GetIO().AddInputCharacter((char)wParam);
 		return 0;
 
 	// Sent when the window size changes
