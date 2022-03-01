@@ -212,6 +212,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 	//update the particle with new information
 	particles[firstDeadIndex].EmitTime = emitTime;
+	particles[firstDeadIndex].StartVelocity = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 	if (emitFromPoint)
 	{
 		particles[firstDeadIndex].StartPosition = transform->GetPosition();

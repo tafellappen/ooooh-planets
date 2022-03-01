@@ -11,12 +11,13 @@
 #include "Transform.h"
 #include "Camera.h"
 
-
+//__declspec(align(16))
 struct ParticleData
 {
 	float EmitTime;
 	DirectX::XMFLOAT3 StartPosition;
-	//DirectX::XMFLOAT3 StartVelocity;
+	DirectX::XMFLOAT3 StartVelocity;
+	float dummy;
 };
 
 class HybridEmitter
