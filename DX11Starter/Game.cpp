@@ -2,7 +2,10 @@
 #include "Vertex.h"
 #include "Mesh.h"
 #include "BufferStructs.h"
-
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
+#include "Input.h"
 #include <vector>
 
 //Joseph hong is here 
@@ -93,6 +96,10 @@ Game::~Game()
 	bloomCombinePS = nullptr;
 	delete gaussianBlurPS;
 	gaussianBlurPS = nullptr;
+
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 // --------------------------------------------------------
@@ -101,6 +108,20 @@ Game::~Game()
 // --------------------------------------------------------
 void Game::Init()
 {
+	//
+	Input::GetInstance().Initialize(this->hWnd);
+
+	//initialize ImGui
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	//style
+	ImGui::StyleColorsClassic();
+
+	//setup platform/renderer backends
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX11_Init(device.Get(), context.Get());
+
 	//loading texture
 //HRESULT res = CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo("../../Assets/Textures/foil_albedo.tif").c_str(), nullptr, srvTexture.GetAddressOf());
 
@@ -249,7 +270,7 @@ void Game::Init()
 	lights.push_back({
 		0,
 		white,
-		15.0f,
+		5.0f,
 		XMFLOAT3(-1.0f, -1.0f, 0.0f)
 		});
 
@@ -358,21 +379,31 @@ void Game::CreateBasicGeometry()
 	entities.push_back(new Entity(meshes[0], materials[0])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[1])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
-	//entities.push_back(new Entity(meshes[0], materials[4])); //sphere obj file
+	entities.push_back(new Entity(meshes[0], materials[3])); //sphere obj file
+	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
+
+
 	sun = std::make_shared<Entity>(meshes[0], materials[4]);
 
-
-	//give a starting position so they're not on top of each other
-	entities[0]->GetTransform()->SetPosition(0.5f, -1, -5);
-	entities[1]->GetTransform()->SetPosition(0, -1, 6);
-	sun->GetTransform()->SetPosition(0.0f, 0.0f, 0.0f);
-	//sun->GetTransform()->SetPosition(2.0f, 2.0f, 2.0f);
-	entities[2]->GetTransform()->SetPosition(0, -1, 0);
-	entities[0]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
-	entities[1]->GetTransform()->SetScale(1.5f, 1.5f, 1.5f);
-	sun->GetTransform()->SetScale(2.5f, 2.5f, 2.5f);
+	entities[0]->GetTransform()->SetPosition(1, 0, 0);
+	entities[1]->GetTransform()->SetPosition(0, 0, -2);
+	entities[2]->GetTransform()->SetPosition(-3, 0, 0);
+	entities[3]->GetTransform()->SetPosition(0, 0, 4);
+	entities[4]->GetTransform()->SetPosition(-1.5f, 0, 0);
 
 
+	sun->GetTransform()->SetPosition(0, 0, 0);
+	sun->GetTransform()->SetScale(3, 3, 3);
+
+	//4 planets
+	//XMFLOAT3 offset[4] = 
+	for (int i = 0; i < entities.size() - 1; i++)
+	{
+		sun->GetTransform()->AddChild(entities[i]->GetTransform());
+		entities[i]->GetTransform()->SetScale(0.1f * (i+3), 0.1f * (i+3), 0.1f * (i+3));
+	}
+	entities[4]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
+	entities[1]->GetTransform()->AddChild(entities[4]->GetTransform());
 }
 
 void Game::ParticleSetup()
@@ -521,27 +552,30 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	//imgui update
+	ImGuiUpdate(deltaTime);
+
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
+	sun->GetTransform()->Rotate(0, deltaTime, 0);
+
 	for (int i = 0; i < entities.size(); i++)
 	{
-		entities[i]->GetTransform()->Rotate(0, deltaTime/(1+i), 0);
+		entities[i]->GetTransform()->Rotate(0, (deltaTime*2)/(1+i), 0);
 	}
-	entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 2, 0, (float)sin(totalTime) * deltaTime * 3);
-	entities[1]->GetTransform()->MoveAbsolute((float)cos(-totalTime) * deltaTime * 6, 0, (float)sin(-totalTime) * deltaTime * 5);
-	entities[2]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 4, 0, (float)sin(totalTime) * deltaTime * 3);
+
+
+	/*entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime, 0, (float)sin(totalTime) * deltaTime);
+	entities[1]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 2, 0, (float)sin(totalTime) * deltaTime * 2);
+	entities[2]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 3, 0, (float)sin(totalTime) * deltaTime * 3);*/
 
 	camera->Update(deltaTime, this->hWnd);
 	emitter1->Update(deltaTime);
 	hEmitter1->Update(deltaTime, totalTime);
 }
-//
-//void Game::CreateLights()
-//{
-//
-//}
+
 
 
 // --------------------------------------------------------
@@ -797,6 +831,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	ID3D11ShaderResourceView* nullSRVs[16] = {};
 	context->PSSetShaderResources(0, 16, nullSRVs);
 
+	//draw Imgui
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
@@ -906,4 +944,30 @@ void Game::BloomCombine()
 
 	// Draw exactly 3 vertices for our "full screen triangle"
 	context->Draw(3, 0);
+}
+
+void Game::ImGuiUpdate(float delta)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	Input& input = Input::GetInstance();
+	io.DeltaTime = delta;
+	io.DisplaySize.x = (float)this->width;
+	io.DisplaySize.y = (float)this->height;
+	io.KeyCtrl = input.KeyDown(VK_CONTROL);
+	io.KeyShift = input.KeyDown(VK_SHIFT);
+	io.KeyAlt = input.KeyDown(VK_MENU);
+	io.MousePos.x = (float)input.GetMouseX();
+	io.MousePos.y = (float)input.GetMouseY();
+	io.MouseDown[0] = input.MouseLeftDown();
+	io.MouseDown[1] = input.MouseRightDown();
+	io.MouseDown[2] = input.MouseMiddleDown();
+	io.MouseWheel = input.GetMouseWheel();
+	input.GetKeyArray(io.KeysDown, 256);
+
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	//show demo window
+	ImGui::ShowDemoWindow();
 }

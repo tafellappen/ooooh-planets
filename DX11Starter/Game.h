@@ -53,7 +53,7 @@ private:
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> target,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sourceTexture);
 	void BloomCombine();
-
+	void ImGuiUpdate(float delta);
 	//void DrawMesh(Mesh* mesh);
 	//void CreateLights();
 	
