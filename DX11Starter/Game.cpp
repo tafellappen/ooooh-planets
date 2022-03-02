@@ -443,8 +443,18 @@ void Game::HybridEmitterSetup()
 		context.Get(),
 		GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(),
 		0, particleTexture.GetAddressOf());
-
-	hEmitter1 = std::make_shared<HybridEmitter>(2, 10, 500, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShaderHybridParticle.get(), pixelShaderHybridParticle.get(), device, context, particleTexture);
+	
+	hEmitter1 = std::make_shared<HybridEmitter>(
+		2, 
+		10, 
+		500, 
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 
+		XMFLOAT3(1.0f, 1.5f, 0.0f),
+		vertexShaderHybridParticle.get(), 
+		pixelShaderHybridParticle.get(), 
+		device, 
+		context, 
+		particleTexture);
 	hEmitter1->SetRectBounds(3.0f, 3.0f, 3.0f);
 }
 

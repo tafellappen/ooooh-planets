@@ -17,7 +17,20 @@ struct ParticleData
 	float EmitTime;
 	DirectX::XMFLOAT3 StartPosition;
 	DirectX::XMFLOAT3 StartVelocity;
-	float dummy;
+};
+
+struct EmitterData
+{
+	float ParticlesPerSecond;
+	float ParticleLifetime;
+	float MaxParticles;
+};
+
+enum EmitterShape
+{
+	Point,
+	RectPrism,
+	Sphere
 };
 
 class HybridEmitter
@@ -30,8 +43,9 @@ public:
 		float particleLifetime,
 		float maxParticles,
 		DirectX::XMFLOAT4 color,
-		SimpleVertexShader* vs,
-		SimplePixelShader* ps,
+		DirectX::XMFLOAT3 startVelocity,
+		std::shared_ptr<SimpleVertexShader> vs,
+		std::shared_ptr<SimplePixelShader> ps,
 		Microsoft::WRL::ComPtr<ID3D11Device> device,
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
@@ -43,6 +57,7 @@ public:
 
 	std::shared_ptr<Transform> GetTransform();
 	void SetRectBounds(float x, float y, float z);
+	void SetEmitterShape(EmitterShape emitShape);
 	//std::shared_ptr<SimpleVertexShader> GetVS() { return vs; }
 	//std::shared_ptr<SimplePixelShader> GetPS() { return ps; }
 private:
@@ -50,7 +65,7 @@ private:
 	int firstDeadIndex;
 	int livingCount;
 	int maxParticles;
-	ParticleData* particles; //pointer to the first element of the array
+	std::shared_ptr<ParticleData> particles; //pointer to the first element of the array
 
 	float particlesEmitPerSec;
 	float secBetweenParticleEmit;
@@ -58,7 +73,7 @@ private:
 
 	float particleLifetime;
 
-	bool emitFromPoint;
+	EmitterShape emitterShape;
 	DirectX::XMFLOAT3 emissionRectDimensions;
 	DirectX::XMFLOAT4 color;
 
@@ -67,8 +82,8 @@ private:
 
 	//std::shared_ptr<SimpleVertexShader> vs;
 	//std::shared_ptr<SimplePixelShader> ps;
-	SimpleVertexShader* vs;
-	SimplePixelShader* ps;
+	std::shared_ptr<SimpleVertexShader> vs;
+	std::shared_ptr<SimplePixelShader> ps;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> particleDataBuffer;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> particleDataSRV;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;

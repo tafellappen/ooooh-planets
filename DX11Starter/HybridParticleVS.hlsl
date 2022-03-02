@@ -11,7 +11,6 @@ struct Particle
 	float EmitTime;
 	float3 StartPosition;
 	float3 StartVelocity;
-	float dummy;
 };
 
 // structured buffer of particle data

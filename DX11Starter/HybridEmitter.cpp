@@ -5,8 +5,9 @@ HybridEmitter::HybridEmitter(
 	float particleLifetime,
 	float maxParticles,
 	DirectX::XMFLOAT4 color,
-	SimpleVertexShader* vs,
-	SimplePixelShader* ps,
+	DirectX::XMFLOAT3 startVelocity,
+	std::shared_ptr<SimpleVertexShader> vs,
+	std::shared_ptr<SimplePixelShader> ps,
 	Microsoft::WRL::ComPtr<ID3D11Device> device,
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
@@ -29,9 +30,9 @@ HybridEmitter::HybridEmitter(
 	firstLivingIndex = 0;
 	firstDeadIndex = 0;
 	transform = std::make_shared<Transform>();
-	emitFromPoint = true;
+	//emitFromPoint = true;
 
-	particles = new ParticleData[maxParticles];
+	particles = std::make_shared<ParticleData[]>(maxParticles);
 
 	// Create an index buffer for particle drawing
 	// indices as if we had two triangles per particle
@@ -80,7 +81,7 @@ HybridEmitter::HybridEmitter(
 
 HybridEmitter::~HybridEmitter()
 {
-	delete[] particles;
+	//delete[] particles;
 	//delete vs; //i guess my asset manager already cleans these up, so i dont need these here?
 	//delete ps;
 }
@@ -139,7 +140,7 @@ void HybridEmitter::Update(float dt, float currentTime)
 		//copy from firstLiving to firstDead
 		memcpy(
 			mapped.pData, //Destination = start of particle buffer
-			particles + firstLivingIndex, //Source = particle array w/ offset to first living particle
+			particles.get() + firstLivingIndex, //Source = particle array w/ offset to first living particle
 			sizeof(ParticleData) * livingCount); //Amount = num of particles in bytes
 	}
 	else
@@ -147,13 +148,13 @@ void HybridEmitter::Update(float dt, float currentTime)
 		//copy from beginning of array until the first dead
 		memcpy(
 			mapped.pData, //Destination = start of particle buffer
-			particles, //Source = start of the particle array
+			particles.get(), //Source = start of the particle array
 			sizeof(ParticleData) * firstDeadIndex); //Amount = num of particles up to first dead
 
 		//copy from the first living to the end of the array
 		memcpy(
 			(void*)((ParticleData*)mapped.pData + firstDeadIndex), //Destination = particle buffer, but the part after where the previous part we copied is
-			particles + firstLivingIndex, //Source = particle array w/ offset to first living particle
+			particles.get() + firstLivingIndex, //Source = particle array w/ offset to first living particle
 			sizeof(ParticleData) * (maxParticles - firstLivingIndex)); //Amount = num of particles in bytes
 	}
 	//unmap (unlock) now that we're done with it
@@ -202,7 +203,21 @@ std::shared_ptr<Transform> HybridEmitter::GetTransform()
 void HybridEmitter::SetRectBounds(float x, float y, float z)
 {
 	emissionRectDimensions = DirectX::XMFLOAT3(x, y, z);
-	emitFromPoint = false;
+	emitterShape = EmitterShape::RectPrism;
+}
+
+void HybridEmitter::SetEmitterShape(EmitterShape emitShape)
+{
+	switch (emitShape)
+	{
+	case EmitterShape::Point:
+
+	case EmitterShape::RectPrism:
+	case EmitterShape::Sphere:
+
+	default:
+		break;
+	}
 }
 
 void HybridEmitter::EmitParticle(float emitTime)
@@ -211,11 +226,11 @@ void HybridEmitter::EmitParticle(float emitTime)
 		return;
 
 	//update the particle with new information
-	particles[firstDeadIndex].EmitTime = emitTime;
-	particles[firstDeadIndex].StartVelocity = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	if (emitFromPoint)
+	particles.get()[firstDeadIndex].EmitTime = emitTime;
+	particles.get()[firstDeadIndex].StartVelocity = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	if (emitterShape == EmitterShape::RectPrism)
 	{
-		particles[firstDeadIndex].StartPosition = transform->GetPosition();
+		particles.get()[firstDeadIndex].StartPosition = transform->GetPosition();
 
 	}
 	else
@@ -226,7 +241,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 		float z = rand() / (float)RAND_MAX * emissionRectDimensions.z;
 
 
-		particles[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
+		particles.get()[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
 	}
 
 
@@ -243,7 +258,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 {
-	float age = currentTime - particles[index].EmitTime;
+	float age = currentTime - particles.get()[index].EmitTime;
 
 	// Update and check for death
 	if (age >= particleLifetime)
