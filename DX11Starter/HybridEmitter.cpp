@@ -32,7 +32,7 @@ HybridEmitter::HybridEmitter(
 	transform = std::make_shared<Transform>();
 	//emitFromPoint = true;
 
-	sphereRadius = 5;
+	sphereRadius = 1;
 	constantStartVelocity = startVelocity;
 
 	particles = new ParticleData[maxParticles];

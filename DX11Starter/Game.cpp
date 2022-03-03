@@ -477,9 +477,10 @@ void Game::HybridEmitterSetup()
 	
 	hEmitter1 = std::make_shared<HybridEmitter>(
 		10, 
-		50, 
-		700, 
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 
+		10, 
+		400, 
+		XMFLOAT4(1, 0.1f, 0.1f, 0.7f),
+		//XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), //white
 		XMFLOAT3(0.0f, 0.0f, 0.0f),
 		vertexShaderHybridParticle, 
 		pixelShaderHybridParticle, 
