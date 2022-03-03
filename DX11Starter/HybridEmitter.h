@@ -4,14 +4,13 @@
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
 #include <iostream>
-
+#include <random>
 
 #include "SimpleShader.h"
 #include "Material.h"
 #include "Transform.h"
 #include "Camera.h"
 
-//__declspec(align(16))
 struct ParticleData
 {
 	float EmitTime;
@@ -65,7 +64,7 @@ private:
 	int firstDeadIndex;
 	int livingCount;
 	int maxParticles;
-	std::shared_ptr<ParticleData> particles; //pointer to the first element of the array
+	ParticleData* particles; //pointer to the first element of the array
 
 	float particlesEmitPerSec;
 	float secBetweenParticleEmit;
@@ -77,6 +76,9 @@ private:
 	DirectX::XMFLOAT3 emissionRectDimensions;
 	DirectX::XMFLOAT4 color;
 
+	std::default_random_engine generator;
+	float sphereRadius;
+	DirectX::XMFLOAT3 constantStartVelocity;
 
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 
@@ -96,5 +98,10 @@ private:
 
 	void EmitParticle(float emitTime);
 	void UpdateSingleParticle(float currentTime, int index);
+
+	/// <summary>
+	/// picks a random point within a sphere
+	/// </summary>
+	DirectX::XMFLOAT3 RandomSphereLocation();
 };
 

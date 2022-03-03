@@ -32,7 +32,10 @@ HybridEmitter::HybridEmitter(
 	transform = std::make_shared<Transform>();
 	//emitFromPoint = true;
 
-	particles = std::make_shared<ParticleData[]>(maxParticles);
+	sphereRadius = 5;
+	constantStartVelocity = startVelocity;
+
+	particles = new ParticleData[maxParticles];
 
 	// Create an index buffer for particle drawing
 	// indices as if we had two triangles per particle
@@ -81,7 +84,7 @@ HybridEmitter::HybridEmitter(
 
 HybridEmitter::~HybridEmitter()
 {
-	//delete[] particles;
+	delete[] particles;
 	//delete vs; //i guess my asset manager already cleans these up, so i dont need these here?
 	//delete ps;
 }
@@ -140,7 +143,7 @@ void HybridEmitter::Update(float dt, float currentTime)
 		//copy from firstLiving to firstDead
 		memcpy(
 			mapped.pData, //Destination = start of particle buffer
-			particles.get() + firstLivingIndex, //Source = particle array w/ offset to first living particle
+			particles + firstLivingIndex, //Source = particle array w/ offset to first living particle
 			sizeof(ParticleData) * livingCount); //Amount = num of particles in bytes
 	}
 	else
@@ -148,13 +151,13 @@ void HybridEmitter::Update(float dt, float currentTime)
 		//copy from beginning of array until the first dead
 		memcpy(
 			mapped.pData, //Destination = start of particle buffer
-			particles.get(), //Source = start of the particle array
+			particles, //Source = start of the particle array
 			sizeof(ParticleData) * firstDeadIndex); //Amount = num of particles up to first dead
 
 		//copy from the first living to the end of the array
 		memcpy(
 			(void*)((ParticleData*)mapped.pData + firstDeadIndex), //Destination = particle buffer, but the part after where the previous part we copied is
-			particles.get() + firstLivingIndex, //Source = particle array w/ offset to first living particle
+			particles + firstLivingIndex, //Source = particle array w/ offset to first living particle
 			sizeof(ParticleData) * (maxParticles - firstLivingIndex)); //Amount = num of particles in bytes
 	}
 	//unmap (unlock) now that we're done with it
@@ -203,7 +206,8 @@ std::shared_ptr<Transform> HybridEmitter::GetTransform()
 void HybridEmitter::SetRectBounds(float x, float y, float z)
 {
 	emissionRectDimensions = DirectX::XMFLOAT3(x, y, z);
-	emitterShape = EmitterShape::RectPrism;
+	emitterShape = EmitterShape::Sphere;
+	//emitterShape = EmitterShape::RectPrism;
 }
 
 void HybridEmitter::SetEmitterShape(EmitterShape emitShape)
@@ -226,14 +230,15 @@ void HybridEmitter::EmitParticle(float emitTime)
 		return;
 
 	//update the particle with new information
-	particles.get()[firstDeadIndex].EmitTime = emitTime;
-	particles.get()[firstDeadIndex].StartVelocity = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	if (emitterShape == EmitterShape::RectPrism)
+	particles[firstDeadIndex].EmitTime = emitTime;
+	particles[firstDeadIndex].StartVelocity = constantStartVelocity;
+	//particles[firstDeadIndex].StartVelocity = ;
+	if (emitterShape == EmitterShape::Point)
 	{
-		particles.get()[firstDeadIndex].StartPosition = transform->GetPosition();
+		particles[firstDeadIndex].StartPosition = transform->GetPosition();
 
 	}
-	else
+	else if(emitterShape == EmitterShape::RectPrism)
 	{
 		//i will be lazy and not center it around the HybridEmitter transform
 		float x = rand() / (float)RAND_MAX * emissionRectDimensions.x;
@@ -241,7 +246,11 @@ void HybridEmitter::EmitParticle(float emitTime)
 		float z = rand() / (float)RAND_MAX * emissionRectDimensions.z;
 
 
-		particles.get()[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
+		particles[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
+	}
+	else if (emitterShape == EmitterShape::Sphere)
+	{
+		particles[firstDeadIndex].StartPosition = RandomSphereLocation();
 	}
 
 
@@ -258,7 +267,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 {
-	float age = currentTime - particles.get()[index].EmitTime;
+	float age = currentTime - particles[index].EmitTime;
 
 	// Update and check for death
 	if (age >= particleLifetime)
@@ -268,4 +277,26 @@ void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 		firstLivingIndex %= maxParticles;
 		livingCount--;
 	}
+}
+
+DirectX::XMFLOAT3 HybridEmitter::RandomSphereLocation()
+{
+	// math source: https://math.stackexchange.com/questions/1585975/how-to-generate-random-points-on-a-sphere
+	// c++ normal distribution info: https://www.cplusplus.com/reference/random/normal_distribution/
+
+	//std::normal_distribution<float> distribution(5.0, 2.0); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
+	std::normal_distribution<float> distribution(0, sphereRadius); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
+	float xGaus = distribution(generator);
+	float yGaus = distribution(generator);
+	float zGaus = distribution(generator);
+
+	DirectX::XMVECTOR normalized = DirectX::XMVector3Normalize(DirectX::XMVectorSet(xGaus, yGaus, zGaus, 1.0f));
+	DirectX::XMFLOAT3 output;
+	DirectX::XMStoreFloat3(&output, normalized);
+
+	xGaus = output.x * sphereRadius;
+	yGaus = output.y * sphereRadius;
+	zGaus = output.z * sphereRadius;
+
+	return DirectX::XMFLOAT3(xGaus, yGaus, zGaus);
 }

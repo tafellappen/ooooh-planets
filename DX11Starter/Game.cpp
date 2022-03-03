@@ -445,13 +445,13 @@ void Game::HybridEmitterSetup()
 		0, particleTexture.GetAddressOf());
 	
 	hEmitter1 = std::make_shared<HybridEmitter>(
-		2, 
 		10, 
-		500, 
+		50, 
+		700, 
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 
-		XMFLOAT3(1.0f, 1.5f, 0.0f),
-		vertexShaderHybridParticle.get(), 
-		pixelShaderHybridParticle.get(), 
+		XMFLOAT3(0.0f, 0.0f, 0.0f),
+		vertexShaderHybridParticle, 
+		pixelShaderHybridParticle, 
 		device, 
 		context, 
 		particleTexture);
