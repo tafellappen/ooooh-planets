@@ -54,6 +54,7 @@ private:
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> sourceTexture);
 	void BloomCombine();
 	void ImGuiUpdate(float delta);
+	void LightUpdate();
 	//void DrawMesh(Mesh* mesh);
 	//void CreateLights();
 	
@@ -72,7 +73,7 @@ private:
 	std::vector<Entity*> entities;
 	std::shared_ptr<Entity> sun;
 	std::vector<std::shared_ptr<Material>> materials;
-	
+	std::vector<Entity*> undrawnOrbiters;
 	std::vector<DirectionalLight> lights;
 
 	// Shaders and shader-related constructs
@@ -118,7 +119,7 @@ private:
 
 	float bloomThreshold;
 	float bloomLevelIntensity;
-	int pointLightIntensity;
+	float pointLightIntensity;
 
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV;		// Allows us to render to a texture
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV;		// Allows us to sample from the same texture

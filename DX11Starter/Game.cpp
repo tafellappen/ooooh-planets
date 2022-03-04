@@ -252,7 +252,7 @@ void Game::Init()
 		context
 	);
 
-	pointLightIntensity = 1;
+	pointLightIntensity = 3.0f;
 
 	ambientColor = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
@@ -285,9 +285,9 @@ void Game::Init()
 
 	//point light
 	lights.push_back({
-		pointLightIntensity,
+		1,
 		white,
-		2.0f,
+		pointLightIntensity,
 		XMFLOAT3(0.0f, 0.0f, 0.0f)
 		//XMFLOAT3(2.0f, 2.0f, 2.0f)
 		});
@@ -384,7 +384,6 @@ void Game::CreateBasicGeometry()
 	entities.push_back(new Entity(meshes[0], materials[3])); //sphere obj file
 	entities.push_back(new Entity(meshes[0], materials[2])); //sphere obj file
 
-
 	sun = std::make_shared<Entity>(meshes[0], materials[4]);
 
 	entities[0]->GetTransform()->SetPosition(1, 0, 0);
@@ -401,7 +400,9 @@ void Game::CreateBasicGeometry()
 	//XMFLOAT3 offset[4] = 
 	for (int i = 0; i < entities.size() - 1; i++)
 	{
-		sun->GetTransform()->AddChild(entities[i]->GetTransform());
+		undrawnOrbiters.push_back(new Entity(NULL, NULL));
+		undrawnOrbiters[i]->GetTransform()->AddChild(entities[i]->GetTransform());
+		//sun->GetTransform()->AddChild(undrawnOrbiters[i]->GetTransform());
 		entities[i]->GetTransform()->SetScale(0.1f * (i+3), 0.1f * (i+3), 0.1f * (i+3));
 	}
 	entities[4]->GetTransform()->SetScale(0.5f, 0.5f, 0.5f);
@@ -570,7 +571,7 @@ void Game::Update(float deltaTime, float totalTime)
 	ImGuiUpdate(deltaTime);
 	ImGui::Begin("Solar System Control Panel");
 	ImGui::Text("Change Point Light Intensity");
-	ImGui::SliderInt("Choose a light intensity", &pointLightIntensity, 0, 5);
+	ImGui::SliderFloat("Choose a light intensity", &pointLightIntensity, 0, 10);
 	if (ImGui::Button("Press to increment"))
 	{
 		pointLightIntensity++;
@@ -582,25 +583,32 @@ void Game::Update(float deltaTime, float totalTime)
 
 	ImGui::Text("Change Bloom Intensity");
 	ImGui::SliderFloat("Choose a number", &bloomLevelIntensity, 0, 1.0f);
-	if (ImGui::Button("Press to increment"))
+
+	LightUpdate();
+	/*if (ImGui::Button("Press to increment"))
 	{
 		bloomLevelIntensity += 0.1f;
 	}
 	if (ImGui::Button("Press to decrement"))
 	{
 		bloomLevelIntensity -= 0.1f;
-	}
+	}*/
 	ImGui::End();
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
 
-	sun->GetTransform()->Rotate(0, deltaTime, 0);
-
+	sun->GetTransform()->Rotate(0, deltaTime/2, 0);
 	for (int i = 0; i < entities.size(); i++)
 	{
 		entities[i]->GetTransform()->Rotate(0, (deltaTime*2)/(1+i), 0);
 	}
+
+
+	undrawnOrbiters[0]->GetTransform()->Rotate(0, deltaTime, 0);
+	undrawnOrbiters[1]->GetTransform()->Rotate(0, deltaTime / 2, 0);
+	undrawnOrbiters[2]->GetTransform()->Rotate(0, deltaTime * 1.5f, 0);
+	undrawnOrbiters[3]->GetTransform()->Rotate(0, deltaTime / 3, 0);
 
 
 	/*entities[0]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime, 0, (float)sin(totalTime) * deltaTime);
@@ -1013,4 +1021,9 @@ void Game::ImGuiUpdate(float delta)
 	//show demo window
 	//ImGui::ShowDemoWindow();
 
+}
+
+void Game::LightUpdate()
+{
+	lights[2].Intensity = pointLightIntensity;
 }
