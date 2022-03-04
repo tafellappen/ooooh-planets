@@ -270,7 +270,7 @@ void Game::Init()
 	lights.push_back({
 		0,
 		white,
-		5.0f,
+		0.3f,
 		XMFLOAT3(-1.0f, -1.0f, 0.0f)
 		});
 
@@ -554,6 +554,7 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	//imgui update
 	ImGuiUpdate(deltaTime);
+	ImGui::Text("This text is in the window");
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -950,6 +951,8 @@ void Game::ImGuiUpdate(float delta)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	Input& input = Input::GetInstance();
+	input.SetGuiKeyboardCapture(false);
+	input.SetGuiMouseCapture(false);
 	io.DeltaTime = delta;
 	io.DisplaySize.x = (float)this->width;
 	io.DisplaySize.y = (float)this->height;
@@ -968,6 +971,10 @@ void Game::ImGuiUpdate(float delta)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	input.SetGuiKeyboardCapture(io.WantCaptureKeyboard);
+	input.SetGuiMouseCapture(io.WantCaptureMouse);
+
 	//show demo window
 	ImGui::ShowDemoWindow();
+
 }
