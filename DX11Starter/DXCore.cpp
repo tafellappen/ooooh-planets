@@ -1,6 +1,6 @@
 #include "DXCore.h"
 #include "imgui/imgui.h"
-
+#include "Input.h"
 #include <WindowsX.h>
 #include <sstream>
 
@@ -148,6 +148,7 @@ HRESULT DXCore::InitWindow()
 	// We need to tell Windows to show it, and how to show it
 	ShowWindow(hWnd, SW_SHOW);
 
+	Input::GetInstance().Initialize(hWnd);
 	// Return an "everything is ok" HRESULT value
 	return S_OK;
 }
@@ -396,10 +397,12 @@ HRESULT DXCore::Run()
 			UpdateTimer();
 			if(titleBarStats)
 				UpdateTitleBarStats();
+			Input::GetInstance().Update();
 
 			// The game loop
 			Update(deltaTime, totalTime);
 			Draw(deltaTime, totalTime);
+			Input::GetInstance().EndOfFrame();
 		}
 	}
 

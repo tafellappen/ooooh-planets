@@ -43,7 +43,7 @@ Game::Game(HINSTANCE hInstance)
 #endif
 
 
-	camera = std::make_shared<Camera>(0, 0, -10, (float)width / (float)height);
+	camera = std::make_shared<Camera>(0, 2, -15, (float)width / (float)height);
 }
 
 // --------------------------------------------------------
@@ -252,6 +252,8 @@ void Game::Init()
 		context
 	);
 
+	pointLightIntensity = 1;
+
 	ambientColor = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	XMFLOAT3 red = XMFLOAT3(1.0f, 0.2f, 0.2f);
@@ -283,7 +285,7 @@ void Game::Init()
 
 	//point light
 	lights.push_back({
-		1,
+		pointLightIntensity,
 		white,
 		2.0f,
 		XMFLOAT3(0.0f, 0.0f, 0.0f)
@@ -554,8 +556,29 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	//imgui update
 	ImGuiUpdate(deltaTime);
-	ImGui::Text("This text is in the window");
+	ImGui::Begin("Solar System Control Panel");
+	ImGui::Text("Change Point Light Intensity");
+	ImGui::SliderInt("Choose a light intensity", &pointLightIntensity, 0, 5);
+	if (ImGui::Button("Press to increment"))
+	{
+		pointLightIntensity++;
+	}
+	if (ImGui::Button("Press to decrement"))
+	{
+		pointLightIntensity--;
+	}
 
+	ImGui::Text("Change Bloom Intensity");
+	ImGui::SliderFloat("Choose a number", &bloomLevelIntensity, 0, 1.0f);
+	if (ImGui::Button("Press to increment"))
+	{
+		bloomLevelIntensity += 0.1f;
+	}
+	if (ImGui::Button("Press to decrement"))
+	{
+		bloomLevelIntensity -= 0.1f;
+	}
+	ImGui::End();
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
@@ -967,6 +990,7 @@ void Game::ImGuiUpdate(float delta)
 	io.MouseWheel = input.GetMouseWheel();
 	input.GetKeyArray(io.KeysDown, 256);
 
+
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -975,6 +999,6 @@ void Game::ImGuiUpdate(float delta)
 	input.SetGuiMouseCapture(io.WantCaptureMouse);
 
 	//show demo window
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 
 }

@@ -118,6 +118,7 @@ private:
 
 	float bloomThreshold;
 	float bloomLevelIntensity;
+	int pointLightIntensity;
 
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> ppRTV;		// Allows us to render to a texture
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ppSRV;		// Allows us to sample from the same texture
