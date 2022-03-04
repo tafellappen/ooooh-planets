@@ -5,8 +5,9 @@ HybridEmitter::HybridEmitter(
 	float particleLifetime,
 	float maxParticles,
 	DirectX::XMFLOAT4 color,
-	SimpleVertexShader* vs,
-	SimplePixelShader* ps,
+	DirectX::XMFLOAT3 startVelocity,
+	std::shared_ptr<SimpleVertexShader> vs,
+	std::shared_ptr<SimplePixelShader> ps,
 	Microsoft::WRL::ComPtr<ID3D11Device> device,
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
@@ -29,7 +30,10 @@ HybridEmitter::HybridEmitter(
 	firstLivingIndex = 0;
 	firstDeadIndex = 0;
 	transform = std::make_shared<Transform>();
-	emitFromPoint = true;
+	//emitFromPoint = true;
+
+	sphereRadius = 1;
+	constantStartVelocity = startVelocity;
 
 	particles = new ParticleData[maxParticles];
 
@@ -202,7 +206,22 @@ std::shared_ptr<Transform> HybridEmitter::GetTransform()
 void HybridEmitter::SetRectBounds(float x, float y, float z)
 {
 	emissionRectDimensions = DirectX::XMFLOAT3(x, y, z);
-	emitFromPoint = false;
+	emitterShape = EmitterShape::Sphere;
+	//emitterShape = EmitterShape::RectPrism;
+}
+
+void HybridEmitter::SetEmitterShape(EmitterShape emitShape)
+{
+	switch (emitShape)
+	{
+	case EmitterShape::Point:
+
+	case EmitterShape::RectPrism:
+	case EmitterShape::Sphere:
+
+	default:
+		break;
+	}
 }
 
 void HybridEmitter::EmitParticle(float emitTime)
@@ -212,12 +231,14 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 	//update the particle with new information
 	particles[firstDeadIndex].EmitTime = emitTime;
-	if (emitFromPoint)
+	particles[firstDeadIndex].StartVelocity = constantStartVelocity;
+	//particles[firstDeadIndex].StartVelocity = ;
+	if (emitterShape == EmitterShape::Point)
 	{
 		particles[firstDeadIndex].StartPosition = transform->GetPosition();
 
 	}
-	else
+	else if(emitterShape == EmitterShape::RectPrism)
 	{
 		//i will be lazy and not center it around the HybridEmitter transform
 		float x = rand() / (float)RAND_MAX * emissionRectDimensions.x;
@@ -226,6 +247,10 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 
 		particles[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
+	}
+	else if (emitterShape == EmitterShape::Sphere)
+	{
+		particles[firstDeadIndex].StartPosition = RandomSphereLocation();
 	}
 
 
@@ -252,4 +277,26 @@ void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 		firstLivingIndex %= maxParticles;
 		livingCount--;
 	}
+}
+
+DirectX::XMFLOAT3 HybridEmitter::RandomSphereLocation()
+{
+	// math source: https://math.stackexchange.com/questions/1585975/how-to-generate-random-points-on-a-sphere
+	// c++ normal distribution info: https://www.cplusplus.com/reference/random/normal_distribution/
+
+	//std::normal_distribution<float> distribution(5.0, 2.0); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
+	std::normal_distribution<float> distribution(0, sphereRadius); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
+	float xGaus = distribution(generator);
+	float yGaus = distribution(generator);
+	float zGaus = distribution(generator);
+
+	DirectX::XMVECTOR normalized = DirectX::XMVector3Normalize(DirectX::XMVectorSet(xGaus, yGaus, zGaus, 1.0f));
+	DirectX::XMFLOAT3 output;
+	DirectX::XMStoreFloat3(&output, normalized);
+
+	xGaus = output.x * sphereRadius;
+	yGaus = output.y * sphereRadius;
+	zGaus = output.z * sphereRadius;
+
+	return DirectX::XMFLOAT3(xGaus, yGaus, zGaus);
 }
