@@ -152,7 +152,7 @@ private:
 	std::shared_ptr<SimpleVertexShader>  vertexShaderHybridParticle;
 	std::shared_ptr<Emitter> emitter1;
 	std::shared_ptr<HybridEmitter> hEmitter1;
-
+	EmitterData* hybridEmitData;
 
 
 };

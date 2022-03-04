@@ -11,6 +11,14 @@
 #include "Transform.h"
 #include "Camera.h"
 
+
+enum EmitterShape
+{
+	Point,
+	RectPrism,
+	Sphere
+};
+
 struct ParticleData
 {
 	float EmitTime;
@@ -20,16 +28,18 @@ struct ParticleData
 
 struct EmitterData
 {
+	EmitterShape EmitShape;
 	float ParticlesPerSecond;
 	float ParticleLifetime;
 	float MaxParticles;
-};
+	DirectX::XMFLOAT4 StartColor;
+	DirectX::XMFLOAT4 EndColor;
+	DirectX::XMFLOAT3 StartVelocity;
+	std::shared_ptr<SimpleVertexShader> VS;
+	std::shared_ptr<SimplePixelShader> PS;
+	Microsoft::WRL::ComPtr<ID3D11Device> Device;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> Context;
 
-enum EmitterShape
-{
-	Point,
-	RectPrism,
-	Sphere
 };
 
 class HybridEmitter
@@ -49,6 +59,9 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
 	);
+
+	HybridEmitter(EmitterData);
+
 	~HybridEmitter();
 
 	void Update(float dt, float currentTime);
@@ -60,6 +73,8 @@ public:
 	//std::shared_ptr<SimpleVertexShader> GetVS() { return vs; }
 	//std::shared_ptr<SimplePixelShader> GetPS() { return ps; }
 private:
+	EmitterData emitterData;
+
 	int firstLivingIndex;
 	int firstDeadIndex;
 	int livingCount;

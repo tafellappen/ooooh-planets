@@ -475,6 +475,19 @@ void Game::HybridEmitterSetup()
 		GetFullPathTo_Wide(L"../../Assets/Textures/particle.jpg").c_str(),
 		0, particleTexture.GetAddressOf());
 	
+	hybridEmitData = new EmitterData;
+	hybridEmitData->EmitShape = EmitterShape::Sphere;
+	hybridEmitData->ParticlesPerSecond = 10;
+	hybridEmitData->ParticleLifetime = 10;
+	hybridEmitData->MaxParticles = 400;
+	hybridEmitData->StartVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	hybridEmitData->StartColor = XMFLOAT4(1.0f, 0.1f, 0.1f, 0.7f);
+	hybridEmitData->EndColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	hybridEmitData->VS = vertexShaderHybridParticle;
+	hybridEmitData->PS = pixelShaderHybridParticle;
+	hybridEmitData->Device = device;
+	hybridEmitData->Context = context;
+
 	hEmitter1 = std::make_shared<HybridEmitter>(
 		10, 
 		10, 
@@ -584,7 +597,7 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[2]->GetTransform()->MoveAbsolute((float)cos(totalTime) * deltaTime * 3, 0, (float)sin(totalTime) * deltaTime * 3);*/
 
 	camera->Update(deltaTime, this->hWnd);
-	emitter1->Update(deltaTime);
+	//emitter1->Update(deltaTime);
 	hEmitter1->Update(deltaTime, totalTime);
 }
 
