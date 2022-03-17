@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Input.h"
 
 using namespace DirectX;
 
@@ -17,13 +18,13 @@ Camera::~Camera()
 void Camera::Update(float dt, HWND windowHandle)
 {
 	//later: speed changing maybe
-
+	Input& input = Input::GetInstance();
 	float speed = dt * 3.0f;
 	//movement (check keyboard)
-	if (GetAsyncKeyState('W') && 0x8000) { transform.MoveRelative(0, 0, speed); }
-	if (GetAsyncKeyState('S') && 0x8000) { transform.MoveRelative(0, 0, -speed); }
-	if (GetAsyncKeyState('A') && 0x8000) { transform.MoveRelative(-speed, 0, 0); }
-	if (GetAsyncKeyState('D') && 0x8000) { transform.MoveRelative(speed, 0, 0); }
+	if (input.KeyDown('W')) { transform.MoveRelative(0, 0, speed); }
+	if (input.KeyDown('S')) { transform.MoveRelative(0, 0, -speed); }
+	if (input.KeyDown('A')) { transform.MoveRelative(-speed, 0, 0); }
+	if (input.KeyDown('D')) { transform.MoveRelative(speed, 0, 0); }
 
 	//mouse looking
 	POINT mousePos = {};
@@ -31,7 +32,7 @@ void Camera::Update(float dt, HWND windowHandle)
 	ScreenToClient(windowHandle, &mousePos); //make relative to window
 	
 	//left mouse?
-	if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) 
+	if (input.MouseLeftDown()) 
 	{
 		float xDiff = dt * (mousePos.x - previousMousePosition.x);
 		float yDiff = dt * (mousePos.y - previousMousePosition.y);
