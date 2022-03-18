@@ -23,6 +23,7 @@ struct ParticleData
 {
 	float EmitTime;
 	float DeathTime;
+	float Lifespan;
 
 	DirectX::XMFLOAT3 StartPosition;
 	DirectX::XMFLOAT3 StartVelocity;
@@ -36,14 +37,14 @@ struct EmitterData
 	EmitterShape EmitShape;
 	float SphereStartRadius;
 	float SphereEndRadius;
-	DirectX::XMFLOAT3 RectDimensions;
+	DirectX::XMFLOAT3 RectDimensions = {};
 
 	float ParticlesPerSecond;
 	float ParticleLifetime;
 	float MaxParticles;
-	DirectX::XMFLOAT4 StartColor;
-	DirectX::XMFLOAT4 EndColor;
-	DirectX::XMFLOAT3 StartVelocity;
+	DirectX::XMFLOAT4 StartColor = {};
+	DirectX::XMFLOAT4 EndColor = {};
+	DirectX::XMFLOAT3 StartVelocity = {};
 	float StartSpeed; //for when you dont want direction
 
 	std::shared_ptr<SimpleVertexShader> VS;

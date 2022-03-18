@@ -483,7 +483,7 @@ void Game::HybridEmitterSetup()
 	hybridEmitData->SphereStartRadius = 0.0f;
 	hybridEmitData->StartSpeed = 2.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
-	hybridEmitData->ParticleLifetime = 10;
+	hybridEmitData->ParticleLifetime = 5;
 	hybridEmitData->MaxParticles = 400;
 	hybridEmitData->StartVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	hybridEmitData->StartColor = XMFLOAT4(1.0f, 0.1f, 0.1f, 0.7f);

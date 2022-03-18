@@ -118,29 +118,29 @@ HybridEmitter::HybridEmitter(EmitterData* emitData)
 	}
 
 
-	//set colors to white if they are not set
-	if (!emitterData->StartColor.x)
-	{
-		if (emitterData->EndColor.x)
-		{
-			emitterData->StartColor = emitterData->EndColor;
-		}
-		else
-		{
-			emitterData->StartColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-	}
-	if (!emitterData->EndColor.x)
-	{
-		if (emitterData->EndColor.x)
-		{
-			emitterData->EndColor = emitterData->StartColor;
-		}
-		else
-		{
-			emitterData->EndColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-	}
+	////set colors to white if they are not set
+	//if (!emitterData->StartColor.x)
+	//{
+	//	if (emitterData->EndColor.x)
+	//	{
+	//		emitterData->StartColor = emitterData->EndColor;
+	//	}
+	//	else
+	//	{
+	//		emitterData->StartColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//	}
+	//}
+	//if (!emitterData->EndColor.x)
+	//{
+	//	if (emitterData->EndColor.x)
+	//	{
+	//		emitterData->EndColor = emitterData->StartColor;
+	//	}
+	//	else
+	//	{
+	//		emitterData->EndColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//	}
+	//}
 
 
 	timeSinceLastEmit = 0.0f;
@@ -346,8 +346,8 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 	//update the particle with new information
 	particles[firstDeadIndex].EmitTime = emitTime;
-	particles[firstDeadIndex].DeathTime = emitTime + emitterData->ParticleLifetime;
-
+	particles[firstDeadIndex].Lifespan = emitterData->ParticleLifetime;
+	//float debug = emitTime - 
 	particles[firstDeadIndex].StartVelocity = constantStartVelocity;
 
 	particles[firstDeadIndex].StartColor = emitterData->StartColor;
