@@ -354,22 +354,18 @@ void HybridEmitter::EmitParticle(float emitTime)
 	particles[firstDeadIndex].EndColor = emitterData->EndColor;
 
 	//particles[firstDeadIndex].StartVelocity = ;
-	if (emitterShape == EmitterShape::Point)
+	if (emitterData->EmitShape == EmitterShape::Point)
 	{
 		particles[firstDeadIndex].StartPosition = transform->GetPosition();
+		particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
 
 	}
-	else if(emitterShape == EmitterShape::RectPrism)
+	else if(emitterData->EmitShape == EmitterShape::RectPrism)
 	{
-		//i will be lazy and not center it around the HybridEmitter transform
-		float x = rand() / (float)RAND_MAX * emissionRectDimensions.x;
-		float y = rand() / (float)RAND_MAX * emissionRectDimensions.y;
-		float z = rand() / (float)RAND_MAX * emissionRectDimensions.z;
-
-
-		particles[firstDeadIndex].StartPosition = DirectX::XMFLOAT3(x, y, z);
+		particles[firstDeadIndex].StartPosition = RandomRectPosition();
+		particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
 	}
-	else if (emitterShape == EmitterShape::Sphere)
+	else if (emitterData->EmitShape == EmitterShape::Sphere)
 	{
 		DirectX::XMFLOAT3 direction = RandomSphericalDirection();
 		DirectX::XMVECTOR speedScale = DirectX::XMVectorScale(DirectX::XMVectorSet(direction.x, direction.y, direction.z, 1.0f), emitterData->StartSpeed);
@@ -389,6 +385,20 @@ void HybridEmitter::EmitParticle(float emitTime)
 	//}
 
 	livingCount++;
+}
+
+DirectX::XMFLOAT3 HybridEmitter::RandomRectPosition()
+{
+	float x = 
+		(rand() / (float)RAND_MAX * emissionRectDimensions.x)
+		- (emissionRectDimensions.x / 2);
+	float y = 
+		(rand() / (float)RAND_MAX * emissionRectDimensions.y)
+		- (emissionRectDimensions.y / 2);
+	float z = 
+		(rand() / (float)RAND_MAX * emissionRectDimensions.z)
+		- (emissionRectDimensions.z / 2);
+	return DirectX::XMFLOAT3(x, y, z);
 }
 
 void HybridEmitter::UpdateSingleParticle(float currentTime, int index)

@@ -22,7 +22,7 @@ enum class EmitterShape
 struct ParticleData
 {
 	float EmitTime;
-	float DeathTime;
+	//float DeathTime;
 	float Lifespan;
 
 	DirectX::XMFLOAT3 StartPosition;
@@ -34,7 +34,8 @@ struct ParticleData
 
 struct EmitterData
 {
-	EmitterShape EmitShape;
+	// shape and dimensions
+	EmitterShape EmitShape = EmitterShape::Point;
 	float SphereStartRadius;
 	float SphereEndRadius;
 	DirectX::XMFLOAT3 RectDimensions = {};
@@ -129,6 +130,7 @@ private:
 	void CreateMissingDefaultValues(); //maybe wont need this???
 
 	void EmitParticle(float emitTime);
+	DirectX::XMFLOAT3 RandomRectPosition();
 	void UpdateSingleParticle(float currentTime, int index);
 
 	/// <summary>

@@ -479,7 +479,7 @@ void Game::HybridEmitterSetup()
 		0, particleTexture.GetAddressOf());
 	
 	hybridEmitData = new EmitterData;
-	hybridEmitData->EmitShape = EmitterShape::Sphere;
+	hybridEmitData->EmitShape = EmitterShape::RectPrism;
 	hybridEmitData->SphereStartRadius = 0.0f;
 	hybridEmitData->StartSpeed = 2.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
@@ -487,7 +487,7 @@ void Game::HybridEmitterSetup()
 	hybridEmitData->MaxParticles = 400;
 	hybridEmitData->StartVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	hybridEmitData->StartColor = XMFLOAT4(1.0f, 0.1f, 0.1f, 0.7f);
-	hybridEmitData->EndColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	hybridEmitData->EndColor = XMFLOAT4(0.5f, 1.0f, 1.0f, 1.0f);
 	hybridEmitData->VS = vertexShaderHybridParticle;
 	hybridEmitData->PS = pixelShaderHybridParticle;
 	hybridEmitData->Device = device;

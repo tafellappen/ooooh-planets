@@ -9,7 +9,7 @@ cbuffer externalData : register(b0)
 struct Particle
 {
 	float EmitTime;
-	float DeathTime;
+	//float DeathTime;
 	float Lifespan;
 
 	float3 StartPosition;
@@ -57,9 +57,9 @@ float4 ColorWithAge(Particle p, float age)
 	//float b = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.z, p.EndColor.z);
 	//float a = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.a, p.EndColor.a);
 
-	float r = MapValues(age, 0.0f, p.Lifespan, p.StartColor.x, p.EndColor.x);
-	float g = MapValues(age, 0.0f, p.Lifespan, p.StartColor.y, p.EndColor.y);
-	float b = MapValues(age, 0.0f, p.Lifespan, p.StartColor.z, p.EndColor.z);
+	float r = MapValues(age, 0.0f, p.Lifespan, p.StartColor.r, p.EndColor.r);
+	float g = MapValues(age, 0.0f, p.Lifespan, p.StartColor.g, p.EndColor.g);
+	float b = MapValues(age, 0.0f, p.Lifespan, p.StartColor.b, p.EndColor.b);
 	float a = MapValues(age, 0.0f, p.Lifespan, p.StartColor.a, p.EndColor.a);
 
 	return float4(r, g, b, a);
