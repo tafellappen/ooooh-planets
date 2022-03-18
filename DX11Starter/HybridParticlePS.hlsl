@@ -7,6 +7,7 @@ struct VertexToPixel
 {
 	float2 uv				: TEXCOORD;
 	float4 position			: SV_POSITION; // The world position of this vertex
+	float4 color; //i have no idea what im supposed to label this
 };
 
 //texture for the particles

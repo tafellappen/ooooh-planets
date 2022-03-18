@@ -480,6 +480,8 @@ void Game::HybridEmitterSetup()
 	
 	hybridEmitData = new EmitterData;
 	hybridEmitData->EmitShape = EmitterShape::Sphere;
+	hybridEmitData->SphereStartRadius = 0.0f;
+	hybridEmitData->StartSpeed = 2.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
 	hybridEmitData->ParticleLifetime = 10;
 	hybridEmitData->MaxParticles = 400;
@@ -490,19 +492,21 @@ void Game::HybridEmitterSetup()
 	hybridEmitData->PS = pixelShaderHybridParticle;
 	hybridEmitData->Device = device;
 	hybridEmitData->Context = context;
+	hybridEmitData->Texture = particleTexture;
 
-	hEmitter1 = std::make_shared<HybridEmitter>(
-		10, 
-		10, 
-		400, 
-		XMFLOAT4(1, 0.1f, 0.1f, 0.7f),
-		//XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), //white
-		XMFLOAT3(0.0f, 0.0f, 0.0f),
-		vertexShaderHybridParticle, 
-		pixelShaderHybridParticle, 
-		device, 
-		context, 
-		particleTexture);
+	//hEmitter1 = std::make_shared<HybridEmitter>(
+	//	10, 
+	//	10, 
+	//	400, 
+	//	XMFLOAT4(1, 0.1f, 0.1f, 0.7f),
+	//	//XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), //white
+	//	XMFLOAT3(0.0f, 0.0f, 0.0f),
+	//	vertexShaderHybridParticle, 
+	//	pixelShaderHybridParticle, 
+	//	device, 
+	//	context, 
+	//	particleTexture);
+	hEmitter1 = std::make_shared<HybridEmitter>(hybridEmitData);
 	hEmitter1->SetRectBounds(3.0f, 3.0f, 3.0f);
 }
 

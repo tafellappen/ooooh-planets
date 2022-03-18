@@ -12,7 +12,7 @@
 #include "Camera.h"
 
 
-enum EmitterShape
+enum class EmitterShape
 {
 	Point,
 	RectPrism,
@@ -22,21 +22,35 @@ enum EmitterShape
 struct ParticleData
 {
 	float EmitTime;
+	float DeathTime;
+
 	DirectX::XMFLOAT3 StartPosition;
 	DirectX::XMFLOAT3 StartVelocity;
+
+	DirectX::XMFLOAT4 StartColor;
+	DirectX::XMFLOAT4 EndColor;
 };
 
 struct EmitterData
 {
 	EmitterShape EmitShape;
+	float SphereStartRadius;
+	float SphereEndRadius;
+	DirectX::XMFLOAT3 RectDimensions;
+
 	float ParticlesPerSecond;
 	float ParticleLifetime;
 	float MaxParticles;
 	DirectX::XMFLOAT4 StartColor;
 	DirectX::XMFLOAT4 EndColor;
 	DirectX::XMFLOAT3 StartVelocity;
+	float StartSpeed; //for when you dont want direction
+
 	std::shared_ptr<SimpleVertexShader> VS;
 	std::shared_ptr<SimplePixelShader> PS;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Texture;
+
+
 	Microsoft::WRL::ComPtr<ID3D11Device> Device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> Context;
 
@@ -60,7 +74,7 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
 	);
 
-	HybridEmitter(EmitterData);
+	HybridEmitter(EmitterData* emitData);
 
 	~HybridEmitter();
 
@@ -73,7 +87,7 @@ public:
 	//std::shared_ptr<SimpleVertexShader> GetVS() { return vs; }
 	//std::shared_ptr<SimplePixelShader> GetPS() { return ps; }
 private:
-	EmitterData emitterData;
+	EmitterData* emitterData;
 
 	int firstLivingIndex;
 	int firstDeadIndex;
@@ -111,12 +125,15 @@ private:
 
 	std::shared_ptr<Transform> transform;
 
+	void CreateMissingDefaultValues(); //maybe wont need this???
+
 	void EmitParticle(float emitTime);
 	void UpdateSingleParticle(float currentTime, int index);
 
 	/// <summary>
 	/// picks a random point within a sphere
 	/// </summary>
-	DirectX::XMFLOAT3 RandomSphereLocation();
+	DirectX::XMFLOAT3 RandomSphereLocation(DirectX::XMFLOAT3 direction);
+	DirectX::XMFLOAT3 RandomSphericalDirection();
 };
 

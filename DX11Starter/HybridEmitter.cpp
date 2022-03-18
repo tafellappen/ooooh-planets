@@ -82,6 +82,121 @@ HybridEmitter::HybridEmitter(
 
 }
 
+HybridEmitter::HybridEmitter(EmitterData* emitData)
+{
+	this->emitterData = emitData;
+	this->particlesEmitPerSec = emitterData->ParticlesPerSecond;
+	this->particleLifetime = emitterData->ParticleLifetime;
+	this->color = emitterData->StartColor;
+	this->vs = emitterData->VS;
+	this->ps = emitterData->PS;
+	this->texture = emitterData->Texture;
+	//this->sampler = sampler;
+	this->maxParticles = emitterData->MaxParticles;
+	this->secBetweenParticleEmit = 1.0f / emitterData->ParticlesPerSecond;
+	constantStartVelocity = emitterData->StartVelocity;
+	this->context = emitterData->Context;
+
+	//default settings for things in case they are undefined
+	switch (emitterData->EmitShape)
+	{
+	case EmitterShape::Point:
+
+	case EmitterShape::RectPrism:
+
+	case EmitterShape::Sphere:
+		if (!emitterData->SphereStartRadius)
+		{
+			emitterData->SphereStartRadius = 1.0f;
+		}
+		/*if (!emitterData->SphereEndRadius)
+		{
+			emitterData->SphereEndRadius = 1.0f;
+		}*/ //dont want to use this right now
+	default:
+		break;
+	}
+
+
+	//set colors to white if they are not set
+	if (!emitterData->StartColor.x)
+	{
+		if (emitterData->EndColor.x)
+		{
+			emitterData->StartColor = emitterData->EndColor;
+		}
+		else
+		{
+			emitterData->StartColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+	}
+	if (!emitterData->EndColor.x)
+	{
+		if (emitterData->EndColor.x)
+		{
+			emitterData->EndColor = emitterData->StartColor;
+		}
+		else
+		{
+			emitterData->EndColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
+	}
+
+
+	timeSinceLastEmit = 0.0f;
+	livingCount = 0;
+	firstLivingIndex = 0;
+	firstDeadIndex = 0;
+	transform = std::make_shared<Transform>();
+	//emitFromPoint = true;
+
+	//sphereRadius = 1;
+
+	particles = new ParticleData[maxParticles];
+
+	// Create an index buffer for particle drawing
+	// indices as if we had two triangles per particle
+	unsigned int* indices = new unsigned int[maxParticles * 6];
+	int indexCount = 0;
+	for (int i = 0; i < maxParticles * 4; i += 4)
+	{
+		indices[indexCount++] = i;
+		indices[indexCount++] = i + 1;
+		indices[indexCount++] = i + 2;
+		indices[indexCount++] = i;
+		indices[indexCount++] = i + 2;
+		indices[indexCount++] = i + 3;
+	}
+	D3D11_SUBRESOURCE_DATA indexData = {};
+	indexData.pSysMem = indices;
+
+	// Regular (static) index buffer
+	D3D11_BUFFER_DESC ibDesc = {};
+	ibDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibDesc.CPUAccessFlags = 0;
+	ibDesc.Usage = D3D11_USAGE_DEFAULT;
+	ibDesc.ByteWidth = sizeof(unsigned int) * maxParticles * 6;
+	emitterData->Device->CreateBuffer(&ibDesc, &indexData, indexBuffer.GetAddressOf());
+	delete[] indices;
+
+	//structured buffer for passing the particle array data to the gpu
+	D3D11_BUFFER_DESC desc = {};
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.Usage = D3D11_USAGE_DYNAMIC;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	desc.StructureByteStride = sizeof(ParticleData);
+	desc.ByteWidth = sizeof(ParticleData) * maxParticles;
+	emitterData->Device->CreateBuffer(&desc, 0, particleDataBuffer.GetAddressOf());
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+	srvDesc.Buffer.FirstElement = 0;
+	srvDesc.Buffer.NumElements = maxParticles;
+	emitterData->Device->CreateShaderResourceView(particleDataBuffer.Get(), &srvDesc, particleDataSRV.GetAddressOf());
+}
+
 HybridEmitter::~HybridEmitter()
 {
 	delete[] particles;
@@ -231,7 +346,13 @@ void HybridEmitter::EmitParticle(float emitTime)
 
 	//update the particle with new information
 	particles[firstDeadIndex].EmitTime = emitTime;
+	particles[firstDeadIndex].DeathTime = emitTime + emitterData->ParticleLifetime;
+
 	particles[firstDeadIndex].StartVelocity = constantStartVelocity;
+
+	particles[firstDeadIndex].StartColor = emitterData->StartColor;
+	particles[firstDeadIndex].EndColor = emitterData->EndColor;
+
 	//particles[firstDeadIndex].StartVelocity = ;
 	if (emitterShape == EmitterShape::Point)
 	{
@@ -250,7 +371,12 @@ void HybridEmitter::EmitParticle(float emitTime)
 	}
 	else if (emitterShape == EmitterShape::Sphere)
 	{
-		particles[firstDeadIndex].StartPosition = RandomSphereLocation();
+		DirectX::XMFLOAT3 direction = RandomSphericalDirection();
+		DirectX::XMVECTOR speedScale = DirectX::XMVectorScale(DirectX::XMVectorSet(direction.x, direction.y, direction.z, 1.0f), emitterData->StartSpeed);
+		DirectX::XMStoreFloat3(&particles[firstDeadIndex].StartVelocity, speedScale);
+		
+		particles[firstDeadIndex].StartPosition = RandomSphereLocation(direction);
+
 	}
 
 
@@ -279,13 +405,25 @@ void HybridEmitter::UpdateSingleParticle(float currentTime, int index)
 	}
 }
 
-DirectX::XMFLOAT3 HybridEmitter::RandomSphereLocation()
+DirectX::XMFLOAT3 HybridEmitter::RandomSphereLocation(DirectX::XMFLOAT3 direction)
 {
 	// math source: https://math.stackexchange.com/questions/1585975/how-to-generate-random-points-on-a-sphere
 	// c++ normal distribution info: https://www.cplusplus.com/reference/random/normal_distribution/
 
 	//std::normal_distribution<float> distribution(5.0, 2.0); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
-	std::normal_distribution<float> distribution(0, sphereRadius); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
+
+	//DirectX::XMFLOAT3 direction = RandomSphericalDirection();
+
+	float x = direction.x * emitterData->SphereStartRadius;
+	float y = direction.y * emitterData->SphereStartRadius;
+	float z = direction.z * emitterData->SphereStartRadius;
+
+	return DirectX::XMFLOAT3(x, y, z);
+}
+
+DirectX::XMFLOAT3 HybridEmitter::RandomSphericalDirection()
+{
+	std::normal_distribution<float> distribution(0, emitterData->SphereStartRadius); //i actually have no idea what to put for this but its getting normalized so it shouldnt matter maybe?
 	float xGaus = distribution(generator);
 	float yGaus = distribution(generator);
 	float zGaus = distribution(generator);
@@ -293,10 +431,5 @@ DirectX::XMFLOAT3 HybridEmitter::RandomSphereLocation()
 	DirectX::XMVECTOR normalized = DirectX::XMVector3Normalize(DirectX::XMVectorSet(xGaus, yGaus, zGaus, 1.0f));
 	DirectX::XMFLOAT3 output;
 	DirectX::XMStoreFloat3(&output, normalized);
-
-	xGaus = output.x * sphereRadius;
-	yGaus = output.y * sphereRadius;
-	zGaus = output.z * sphereRadius;
-
-	return DirectX::XMFLOAT3(xGaus, yGaus, zGaus);
+	return output;
 }

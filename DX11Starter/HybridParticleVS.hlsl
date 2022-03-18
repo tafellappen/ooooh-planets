@@ -9,8 +9,14 @@ cbuffer externalData : register(b0)
 struct Particle
 {
 	float EmitTime;
+	float DeathTime;
+
 	float3 StartPosition;
+	//float3 EndPosition;
 	float3 StartVelocity;
+
+	float4 StartColor;
+	float4 EndColor;
 };
 
 // structured buffer of particle data
@@ -29,6 +35,23 @@ struct VertexToPixel
 	float2 uv				: TEXCOORD;
 	float4 position			: SV_POSITION;
 };
+
+//https://gamedev.stackexchange.com/questions/147890/is-there-an-hlsl-equivalent-to-glsls-map-function
+//is it just me or does everything i wish had a map function built in just not have it
+float MapValues(float value, float min1, float max1, float min2, float max2)
+{
+	// Convert the current value to a percentage
+	// 0% - min1, 100% - max1
+	float perc = (value - min1) / (max1 - min1);
+
+	// Do the same operation backwards with min2 and max2
+	return perc * (max2 - min2) + min2;
+}
+
+float4 ColorWithAge(float age)
+{
+	float x = MapValues(age);
+}
 
 VertexToPixel main(uint id : SV_VertexID)
 {
