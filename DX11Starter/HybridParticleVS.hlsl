@@ -38,8 +38,8 @@ struct VertexToPixel
 	float4 color			: COLOR;
 };
 
-//https://gamedev.stackexchange.com/questions/147890/is-there-an-hlsl-equivalent-to-glsls-map-function
 //is it just me or does everything i wish had a map function built in just not have it
+//https://gamedev.stackexchange.com/questions/147890/is-there-an-hlsl-equivalent-to-glsls-map-function
 float MapValues(float value, float inputMin, float inputMax, float outputMin, float outputMax)
 {
 	// Convert the current value to a percentage
@@ -52,11 +52,6 @@ float MapValues(float value, float inputMin, float inputMax, float outputMin, fl
 
 float4 ColorWithAge(Particle p, float age)
 {
-	//float r = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.x, p.EndColor.x);
-	//float g = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.y, p.EndColor.y);
-	//float b = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.z, p.EndColor.z);
-	//float a = MapValues(age, p.EmitTime, p.DeathTime, p.StartColor.a, p.EndColor.a);
-
 	float r = MapValues(age, 0.0f, p.Lifespan, p.StartColor.r, p.EndColor.r);
 	float g = MapValues(age, 0.0f, p.Lifespan, p.StartColor.g, p.EndColor.g);
 	float b = MapValues(age, 0.0f, p.Lifespan, p.StartColor.b, p.EndColor.b);

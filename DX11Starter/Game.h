@@ -40,6 +40,7 @@ private:
 
 	void ParticleSetup();
 	void HybridEmitterSetup();
+	void ParticleGuiPanel();
 
 	void ResizeAllPostProcessResources();
 	void ResizeOnePostProcessResource(Microsoft::WRL::ComPtr<ID3D11RenderTargetView>& rtv, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, float renderTargetScale = 1.0f);

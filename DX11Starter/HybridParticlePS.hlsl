@@ -1,7 +1,7 @@
-cbuffer perMaterial : register(b0)
-{
-	float4 Color;
-}
+//cbuffer perMaterial : register(b0)
+//{
+//	float4 Color;
+//}
 
 struct VertexToPixel
 {

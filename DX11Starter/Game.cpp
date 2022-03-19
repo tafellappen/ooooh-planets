@@ -479,8 +479,7 @@ void Game::HybridEmitterSetup()
 		0, particleTexture.GetAddressOf());
 	
 	hybridEmitData = new EmitterData;
-	hybridEmitData->EmitShape = EmitterShape::RectPrism;
-	hybridEmitData->SphereStartRadius = 0.0f;
+	hybridEmitData->EmitShape = EmitterShape::Sphere;
 	hybridEmitData->StartSpeed = 2.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
 	hybridEmitData->ParticleLifetime = 5;
@@ -508,6 +507,62 @@ void Game::HybridEmitterSetup()
 	//	particleTexture);
 	hEmitter1 = std::make_shared<HybridEmitter>(hybridEmitData);
 	hEmitter1->SetRectBounds(3.0f, 3.0f, 3.0f);
+}
+
+void Game::ParticleGuiPanel()
+{
+	ImGui::Begin("Particles Control Panel");
+	//enums are a pain with imgui
+	//if (ImGui::TreeNode("Select Emitter Area Shape"))
+	//{
+	//	static int selected = -1;
+	//	for (int n = 0; n < 2; n++)
+	//	{
+	//		char buf[32];
+	//		sprintf(buf, "Object %d", n);
+	//		if (ImGui::Selectable(buf, selected == n))
+	//			selected = n;
+	//	}
+	//	ImGui::TreePop();
+	//}
+
+	//for some reason this breaks when I use the tree node
+	if (ImGui::TreeNode("Emitter Area Dimensions"))
+	{
+		EmitterData* currentEmitData = hEmitter1->GetEmitterData();
+
+
+		ImGui::SliderFloat("Radius", &currentEmitData->SphereRadius, 0, 5.0f);
+		ImGui::SliderFloat("(broken) Particles Per Second", &currentEmitData->ParticlesPerSecond, 0, 5.0f); //this does not work currently because of the rate of spawning being mathed out in the constructor
+		ImGui::SliderFloat("Particle Lifetime", &currentEmitData->ParticleLifetime, 0, 5.0f);
+		//ImGui::SliderInt("Max Particles", &currentEmitData->MaxParticles, 0, 5.0f); //this breaks the circular buffer, would need some way of managing the size of that
+
+		//ImGui::Text("Particle Colors");
+		ImGui::ColorEdit4("Particle Start Color", (float*)&currentEmitData->StartColor);
+		ImGui::ColorEdit4("Particle End Color", (float*)&currentEmitData->EndColor);
+
+		if (ImGui::TreeNode("Point and RectPrism only"))
+		{
+			ImGui::DragFloat3("Start Velocity", (float*)&currentEmitData->StartVelocity);
+			ImGui::TreePop();
+
+		}
+
+		if (ImGui::TreeNode("RectPrism only"))
+		{
+			ImGui::DragFloat3("Rect Spawn Area Dimensions", (float*)&currentEmitData->RectDimensions);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sphere Only"))
+		{
+			ImGui::SliderFloat("Start Speed", &currentEmitData->StartSpeed, -5.0f, 5.0f);
+			ImGui::TreePop();
+		}
+
+		ImGui::TreePop();
+	}
+
+	ImGui::End();
 }
 
 void Game::ResizeAllPostProcessResources()
@@ -611,6 +666,9 @@ void Game::Update(float deltaTime, float totalTime)
 		bloomLevelIntensity -= 0.1f;
 	}*/
 	ImGui::End();
+
+	ParticleGuiPanel();
+
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();

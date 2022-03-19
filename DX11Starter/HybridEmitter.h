@@ -11,6 +11,11 @@
 #include "Transform.h"
 #include "Camera.h"
 
+enum class ParticleMoveType
+{
+	Constant,
+	PhysicsSimulation
+};
 
 enum class EmitterShape
 {
@@ -36,18 +41,21 @@ struct EmitterData
 {
 	// shape and dimensions
 	EmitterShape EmitShape = EmitterShape::Point;
-	float SphereStartRadius;
-	float SphereEndRadius;
+	float SphereRadius = 0.0f;
 	DirectX::XMFLOAT3 RectDimensions = {};
 
-	float ParticlesPerSecond;
-	float ParticleLifetime;
-	float MaxParticles;
+	//general spawning info
+	float ParticlesPerSecond = 0.0f;
+	float ParticleLifetime = 0.0f;
+	int MaxParticles = 0.0f;
+
+	//other particle data
 	DirectX::XMFLOAT4 StartColor = {};
 	DirectX::XMFLOAT4 EndColor = {};
 	DirectX::XMFLOAT3 StartVelocity = {};
-	float StartSpeed; //for when you dont want direction
+	float StartSpeed = 0.0f; //for when direction will be figured out later
 
+	//stuff for rendering
 	std::shared_ptr<SimpleVertexShader> VS;
 	std::shared_ptr<SimplePixelShader> PS;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Texture;
@@ -61,21 +69,6 @@ struct EmitterData
 class HybridEmitter
 {
 public:
-	//std::shared_ptr<SimpleVertexShader> vs,
-	//std::shared_ptr<SimplePixelShader> ps,
-	HybridEmitter(
-		float particlesEmitPerSec,
-		float particleLifetime,
-		float maxParticles,
-		DirectX::XMFLOAT4 color,
-		DirectX::XMFLOAT3 startVelocity,
-		std::shared_ptr<SimpleVertexShader> vs,
-		std::shared_ptr<SimplePixelShader> ps,
-		Microsoft::WRL::ComPtr<ID3D11Device> device,
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture
-	);
-
 	HybridEmitter(EmitterData* emitData);
 
 	~HybridEmitter();
@@ -86,6 +79,9 @@ public:
 	std::shared_ptr<Transform> GetTransform();
 	void SetRectBounds(float x, float y, float z);
 	void SetEmitterShape(EmitterShape emitShape);
+
+	EmitterData* GetEmitterData();
+
 	//std::shared_ptr<SimpleVertexShader> GetVS() { return vs; }
 	//std::shared_ptr<SimplePixelShader> GetPS() { return ps; }
 private:
@@ -94,22 +90,22 @@ private:
 	int firstLivingIndex;
 	int firstDeadIndex;
 	int livingCount;
-	int maxParticles;
+	//int maxParticles;
 	ParticleData* particles; //pointer to the first element of the array
 
-	float particlesEmitPerSec;
+	//float particlesEmitPerSec;
 	float secBetweenParticleEmit;
 	float timeSinceLastEmit;
 
-	float particleLifetime;
+	//float particleLifetime;
 
 	EmitterShape emitterShape;
-	DirectX::XMFLOAT3 emissionRectDimensions;
-	DirectX::XMFLOAT4 color;
+	//DirectX::XMFLOAT3 emissionRectDimensions;
+	//DirectX::XMFLOAT4 color;
 
 	std::default_random_engine generator;
-	float sphereRadius;
-	DirectX::XMFLOAT3 constantStartVelocity;
+	//float sphereRadius;
+	//DirectX::XMFLOAT3 constantStartVelocity;
 
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 
