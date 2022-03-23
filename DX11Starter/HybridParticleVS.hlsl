@@ -9,7 +9,6 @@ cbuffer externalData : register(b0)
 struct Particle
 {
 	float EmitTime;
-	//float DeathTime;
 	float Lifespan;
 
 	float3 StartPosition;
@@ -18,6 +17,10 @@ struct Particle
 
 	float4 StartColor;
 	float4 EndColor;
+
+	float Acceleration;
+	//float Mass;
+	//float3 InitialForces;
 };
 
 // structured buffer of particle data
@@ -37,6 +40,11 @@ struct VertexToPixel
 	float4 position			: SV_POSITION;
 	float4 color			: COLOR;
 };
+
+float3 CalcForces(Particle p)
+{
+
+}
 
 //is it just me or does everything i wish had a map function built in just not have it
 //https://gamedev.stackexchange.com/questions/147890/is-there-an-hlsl-equivalent-to-glsls-map-function
@@ -82,12 +90,15 @@ VertexToPixel main(uint id : SV_VertexID)
 	//simulation:
 	//calculate the age of the particle (in seconds, and/or as percent of lifetime)
 	float age = currentTime - p.EmitTime;
+	if (age == 0) //if this is the first frame a particle exists
+	{
+
+	}
 	//use age along with other particle data to calculate a final psition
 	float3 pos = p.StartPosition;
-	//we will cheat and use the start position for a little motion variance
-	//pos += float3(0.7f, 0.5, p.StartPosition.x) * age;
+
 	float accel = 0; //temporary
-	pos = accel * age * age / 2.0f + p.StartVelocity * age + p.StartPosition;
+	pos = p.Acceleration * age * age / 2.0f + p.StartVelocity * age + p.StartPosition;
 
 	// Offsets for the 4 corners of a quad - we'll only
 	// use one for each vertex, but which one depends

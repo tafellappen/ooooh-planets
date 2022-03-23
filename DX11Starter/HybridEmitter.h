@@ -11,17 +11,18 @@
 #include "Transform.h"
 #include "Camera.h"
 
-enum class ParticleMoveType
-{
-	Constant,
-	PhysicsSimulation
-};
 
 enum class EmitterShape
 {
 	Point,
 	RectPrism,
 	Sphere
+};
+
+enum class ParticleMoveType
+{
+	Constant,
+	PhysicsSimulation
 };
 
 struct ParticleData
@@ -35,6 +36,15 @@ struct ParticleData
 
 	DirectX::XMFLOAT4 StartColor;
 	DirectX::XMFLOAT4 EndColor;
+
+	float Acceleration;
+	//DirectX::XMFLOAT3 InitialForces;
+};
+
+//yeah im not really sure what to do here. maybe i will pull this out into its own class
+struct Colors
+{
+	DirectX::XMFLOAT4 Red = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 };
 
 struct EmitterData
@@ -85,6 +95,10 @@ public:
 	//std::shared_ptr<SimpleVertexShader> GetVS() { return vs; }
 	//std::shared_ptr<SimplePixelShader> GetPS() { return ps; }
 private:
+	DirectX::XMFLOAT3* initialForces; //array of all of the forces that need to be applied when the particle spawns
+	DirectX::XMFLOAT3* constantForces; //array of all of the forces that need to be applied for the duration of the particle's life
+
+
 	EmitterData* emitterData;
 
 	int firstLivingIndex;
@@ -134,5 +148,7 @@ private:
 	/// </summary>
 	DirectX::XMFLOAT3 RandomSphereLocation(DirectX::XMFLOAT3 direction);
 	DirectX::XMFLOAT3 RandomSphericalDirection();
+
+	float CalcAcceleration();
 };
 

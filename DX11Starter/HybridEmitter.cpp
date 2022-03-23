@@ -3,46 +3,19 @@
 HybridEmitter::HybridEmitter(EmitterData* emitData)
 {
 	this->emitterData = emitData;
-	//this->particlesEmitPerSec = emitterData->ParticlesPerSecond;
-	//this->particleLifetime = emitterData->ParticleLifetime;
-	//this->color = emitterData->StartColor;
 	this->vs = emitterData->VS;
 	this->ps = emitterData->PS;
 	this->texture = emitterData->Texture;
-	//this->sampler = sampler;
-	//this->maxParticles = emitterData->MaxParticles;
-	this->secBetweenParticleEmit = 1.0f / emitterData->ParticlesPerSecond;
-	//constantStartVelocity = emitterData->StartVelocity;
 	this->context = emitterData->Context;
 
-	////default settings for things in case they are undefined
-	//switch (emitterData->EmitShape)
-	//{
-	//case EmitterShape::Point:
 
-	//case EmitterShape::RectPrism:
 
-	//case EmitterShape::Sphere:
-	//	if (!emitterData->SphereStartRadius)
-	//	{
-	//		emitterData->SphereStartRadius = 1.0f;
-	//	}
-	//	/*if (!emitterData->SphereEndRadius)
-	//	{
-	//		emitterData->SphereEndRadius = 1.0f;
-	//	}*/ //dont want to use this right now
-	//default:
-	//	break;
-	//}
 
 	timeSinceLastEmit = 0.0f;
 	livingCount = 0;
 	firstLivingIndex = 0;
 	firstDeadIndex = 0;
 	transform = std::make_shared<Transform>();
-	//emitFromPoint = true;
-
-	//sphereRadius = 1;
 
 	particles = new ParticleData[emitterData->MaxParticles];
 
@@ -98,6 +71,8 @@ HybridEmitter::~HybridEmitter()
 
 void HybridEmitter::Update(float dt, float currentTime)
 {
+	this->secBetweenParticleEmit = 1.0f / emitterData->ParticlesPerSecond;
+
 	//"first" as in the first one you would get to as the index counts up
 	//this would also make "first" living the "oldest" living particle
 	//bool contiguousLiving = firstLivingIndex < firstDeadIndex;
@@ -242,6 +217,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 	particles[firstDeadIndex].Lifespan = emitterData->ParticleLifetime;
 	//float debug = emitTime - 
 	particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
+	particles[firstDeadIndex].Acceleration = CalcAcceleration();
 
 	particles[firstDeadIndex].StartColor = emitterData->StartColor;
 	particles[firstDeadIndex].EndColor = emitterData->EndColor;
@@ -335,4 +311,10 @@ DirectX::XMFLOAT3 HybridEmitter::RandomSphericalDirection()
 	DirectX::XMFLOAT3 output;
 	DirectX::XMStoreFloat3(&output, normalized);
 	return output;
+}
+
+float HybridEmitter::CalcAcceleration()
+{
+	//i just need to calculate acceleration and send *that* to the gpu. idk if there is more or less that is needed
+	return 0.0f;
 }

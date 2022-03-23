@@ -533,7 +533,7 @@ void Game::ParticleGuiPanel()
 
 
 		ImGui::SliderFloat("Radius", &currentEmitData->SphereRadius, 0, 5.0f);
-		ImGui::SliderFloat("(broken) Particles Per Second", &currentEmitData->ParticlesPerSecond, 0, 5.0f); //this does not work currently because of the rate of spawning being mathed out in the constructor
+		ImGui::SliderFloat("Particles Per Second", &currentEmitData->ParticlesPerSecond, 0, 50.0f); //this does not work currently because of the rate of spawning being mathed out in the constructor
 		ImGui::SliderFloat("Particle Lifetime", &currentEmitData->ParticleLifetime, 0, 5.0f);
 		//ImGui::SliderInt("Max Particles", &currentEmitData->MaxParticles, 0, 5.0f); //this breaks the circular buffer, would need some way of managing the size of that
 
