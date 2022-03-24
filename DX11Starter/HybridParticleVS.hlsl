@@ -20,6 +20,7 @@ struct Particle
 	float4 EndColor;
 
 	float Acceleration;
+	//float LifetimeAcceleration;
 	//float Mass;
 	//float3 InitialForces;
 };
@@ -73,16 +74,9 @@ VertexToPixel main(uint id : SV_VertexID)
 {
 	VertexToPixel output;
 
-
-
-	////test stuff so i can try to get just the cpp working first
-	//output.worldPos = mul(world, float4(input.position, 1.0f)).xyz;
-	//output.uv = input.uv;
-
 	//use vertex's id to calc the particle index and corner index
 	uint particleID = id / 4; // 4 verticies to one particle
 	uint cornerID = id % 4; // 0,1,2,3 = the corner of the particle "quad"
-
 
 	//retreive the proper particle from the structured buffer
 	//grab one particle and calculate its age
@@ -98,8 +92,7 @@ VertexToPixel main(uint id : SV_VertexID)
 	//use age along with other particle data to calculate a final psition
 	float3 pos = p.StartPosition;
 
-	float accel = 0; //temporary
-	pos = p.Acceleration * age * age / 2.0f + p.StartVelocity * age + p.StartPosition;
+	pos = (p.Acceleration * age * age / 2.0f + p.StartVelocity * age) + p.StartPosition;
 
 	// Offsets for the 4 corners of a quad - we'll only
 	// use one for each vertex, but which one depends

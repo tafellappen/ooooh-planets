@@ -479,12 +479,17 @@ void Game::HybridEmitterSetup()
 		0, particleTexture.GetAddressOf());
 	
 	hybridEmitData = new EmitterData;
-	hybridEmitData->EmitShape = EmitterShape::Sphere;
+	hybridEmitData->EmitShape = EmitterShape::RectPrism;
 	hybridEmitData->StartSpeed = 0.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
 	hybridEmitData->ParticleLifetime = 5;
 	hybridEmitData->MaxParticles = 400;
 	hybridEmitData->StartVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	//hybridEmitData->InitialForceDirection = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	hybridEmitData->InitialForce = 1.0f;
+	hybridEmitData->Mass = 1.0f;
+
 	hybridEmitData->StartColor = XMFLOAT4(1.0f, 0.1f, 0.1f, 0.7f);
 	hybridEmitData->EndColor = XMFLOAT4(0.5f, 1.0f, 1.0f, 1.0f);
 	hybridEmitData->VS = vertexShaderHybridParticle;
@@ -535,6 +540,8 @@ void Game::ParticleGuiPanel()
 		ImGui::SliderFloat("Radius", &currentEmitData->SphereRadius, 0, 5.0f);
 		ImGui::SliderFloat("Particles Per Second", &currentEmitData->ParticlesPerSecond, 0, 50.0f); //this does not work currently because of the rate of spawning being mathed out in the constructor
 		ImGui::SliderFloat("Particle Lifetime", &currentEmitData->ParticleLifetime, 0, 5.0f);
+		ImGui::SliderFloat("Initial Force", &currentEmitData->InitialForce, 0, 5.0f);
+		ImGui::SliderFloat("Particle Mass", &currentEmitData->Mass, 0, 5.0f);
 		//ImGui::SliderInt("Max Particles", &currentEmitData->MaxParticles, 0, 5.0f); //this breaks the circular buffer, would need some way of managing the size of that
 
 		//ImGui::Text("Particle Colors");

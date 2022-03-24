@@ -10,9 +10,9 @@ HybridEmitter::HybridEmitter(EmitterData* emitData)
 
 	{
 		//ensure direction is normalized
-		DirectX::XMFLOAT3 dir = emitterData->StartDirection;
+		DirectX::XMFLOAT3 dir = emitterData->InitialForceDirection;
 		DirectX::XMVECTOR normDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(dir.x, dir.y, dir.z, 1.0f));
-		DirectX::XMStoreFloat3(&emitterData->StartDirection, normDirection);
+		DirectX::XMStoreFloat3(&emitterData->InitialForceDirection, normDirection);
 	}
 
 
@@ -222,6 +222,7 @@ void HybridEmitter::EmitParticle(float emitTime)
 	particles[firstDeadIndex].Lifespan = emitterData->ParticleLifetime;
 	//float debug = emitTime - 
 	particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
+	//particles[firstDeadIndex].StartDirection = emitterData->InitialForceDirection;
 	particles[firstDeadIndex].Acceleration = CalcAcceleration();
 
 	particles[firstDeadIndex].StartColor = emitterData->StartColor;
@@ -241,11 +242,16 @@ void HybridEmitter::EmitParticle(float emitTime)
 	}
 	else if (emitterData->EmitShape == EmitterShape::Sphere)
 	{
+		//decide starting position
 		DirectX::XMFLOAT3 direction = RandomSphericalDirection();
-		DirectX::XMVECTOR speedScale = DirectX::XMVectorScale(DirectX::XMVectorSet(direction.x, direction.y, direction.z, 1.0f), emitterData->StartSpeed);
-		DirectX::XMStoreFloat3(&particles[firstDeadIndex].StartVelocity, speedScale);
-		
 		particles[firstDeadIndex].StartPosition = RandomSphereLocation(direction);
+
+		//DirectX::XMVECTOR speedScale = DirectX::XMVectorScale(DirectX::XMVectorSet(direction.x, direction.y, direction.z, 1.0f), emitterData->StartSpeed);
+		//DirectX::XMStoreFloat3(&particles[firstDeadIndex].StartVelocity, speedScale);
+
+		//decide StartingVelocity
+		particles[firstDeadIndex].StartVelocity = SphericalBurstVelocity(particles[firstDeadIndex].StartPosition);
+
 
 	}
 
@@ -320,6 +326,29 @@ DirectX::XMFLOAT3 HybridEmitter::RandomSphericalDirection()
 
 float HybridEmitter::CalcAcceleration()
 {
-	//i just need to calculate acceleration and send *that* to the gpu. idk if there is more or less that is needed
-	return 1.0f;
+	return emitterData->InitialForce/emitterData->Mass;
+}
+
+DirectX::XMFLOAT3 HybridEmitter::SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition)
+{
+	DirectX::XMFLOAT3 emitterPos = transform->GetPosition();
+
+	//find normalized direction from the emitter's position to the particle
+	DirectX::XMVECTOR emitterCenter = DirectX::XMVectorSet(emitterPos.x, emitterPos.y, emitterPos.z, 1.0f);
+	DirectX::XMVECTOR particlePos = DirectX::XMVectorSet(particleStartPosition.x, particleStartPosition.y, particleStartPosition.z, 1.0f);
+	DirectX::XMVECTOR directionFromCenter = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(particlePos, emitterCenter));
+
+	//scale by acceleration
+	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(directionFromCenter, CalcAcceleration());
+
+	//store and return
+	DirectX::XMFLOAT3 finalVelocity;
+	DirectX::XMStoreFloat3(&finalVelocity, directionFromCenter);
+
+	return finalVelocity;
+}
+
+DirectX::XMFLOAT3 HybridEmitter::SingleDirectionalForce()
+{
+	return DirectX::XMFLOAT3();
 }

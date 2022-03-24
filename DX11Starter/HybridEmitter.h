@@ -64,8 +64,10 @@ struct EmitterData
 	DirectX::XMFLOAT4 StartColor = {};
 	DirectX::XMFLOAT4 EndColor = {};
 	DirectX::XMFLOAT3 StartVelocity = {};
-	DirectX::XMFLOAT3 StartDirection = {};
+	DirectX::XMFLOAT3 InitialForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
 	float StartSpeed = 0.0f; //for when direction will be figured out later
+	float InitialForce = 0.0f;
+	float Mass = 0.0f;
 	//DirectX::XMFLOAT3 StartForce = {};
 
 
@@ -154,5 +156,10 @@ private:
 	DirectX::XMFLOAT3 RandomSphericalDirection();
 
 	float CalcAcceleration();
+
+	//calculates velocity for a spherical burst
+	DirectX::XMFLOAT3 SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition);
+	DirectX::XMFLOAT3 SingleDirectionalForce();
+
 };
 
