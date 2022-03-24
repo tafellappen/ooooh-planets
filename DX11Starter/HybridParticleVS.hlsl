@@ -14,6 +14,7 @@ struct Particle
 	float3 StartPosition;
 	//float3 EndPosition;
 	float3 StartVelocity;
+	float3 StartDirection;
 
 	float4 StartColor;
 	float4 EndColor;

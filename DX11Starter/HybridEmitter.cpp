@@ -8,7 +8,12 @@ HybridEmitter::HybridEmitter(EmitterData* emitData)
 	this->texture = emitterData->Texture;
 	this->context = emitterData->Context;
 
-
+	{
+		//ensure direction is normalized
+		DirectX::XMFLOAT3 dir = emitterData->StartDirection;
+		DirectX::XMVECTOR normDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(dir.x, dir.y, dir.z, 1.0f));
+		DirectX::XMStoreFloat3(&emitterData->StartDirection, normDirection);
+	}
 
 
 	timeSinceLastEmit = 0.0f;
@@ -226,13 +231,13 @@ void HybridEmitter::EmitParticle(float emitTime)
 	if (emitterData->EmitShape == EmitterShape::Point)
 	{
 		particles[firstDeadIndex].StartPosition = transform->GetPosition();
-		particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
+		//particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
 
 	}
 	else if(emitterData->EmitShape == EmitterShape::RectPrism)
 	{
 		particles[firstDeadIndex].StartPosition = RandomRectPosition();
-		particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
+		//particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
 	}
 	else if (emitterData->EmitShape == EmitterShape::Sphere)
 	{
@@ -316,5 +321,5 @@ DirectX::XMFLOAT3 HybridEmitter::RandomSphericalDirection()
 float HybridEmitter::CalcAcceleration()
 {
 	//i just need to calculate acceleration and send *that* to the gpu. idk if there is more or less that is needed
-	return 0.0f;
+	return 1.0f;
 }

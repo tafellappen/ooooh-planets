@@ -33,6 +33,7 @@ struct ParticleData
 
 	DirectX::XMFLOAT3 StartPosition;
 	DirectX::XMFLOAT3 StartVelocity;
+	DirectX::XMFLOAT3 StartDirection;
 
 	DirectX::XMFLOAT4 StartColor;
 	DirectX::XMFLOAT4 EndColor;
@@ -59,11 +60,14 @@ struct EmitterData
 	float ParticleLifetime = 0.0f;
 	int MaxParticles = 0.0f;
 
-	//other particle data
+	//variables for things used while particles are alive
 	DirectX::XMFLOAT4 StartColor = {};
 	DirectX::XMFLOAT4 EndColor = {};
 	DirectX::XMFLOAT3 StartVelocity = {};
+	DirectX::XMFLOAT3 StartDirection = {};
 	float StartSpeed = 0.0f; //for when direction will be figured out later
+	//DirectX::XMFLOAT3 StartForce = {};
+
 
 	//stuff for rendering
 	std::shared_ptr<SimpleVertexShader> VS;

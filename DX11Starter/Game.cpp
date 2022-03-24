@@ -480,7 +480,7 @@ void Game::HybridEmitterSetup()
 	
 	hybridEmitData = new EmitterData;
 	hybridEmitData->EmitShape = EmitterShape::Sphere;
-	hybridEmitData->StartSpeed = 2.0f;
+	hybridEmitData->StartSpeed = 0.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
 	hybridEmitData->ParticleLifetime = 5;
 	hybridEmitData->MaxParticles = 400;
