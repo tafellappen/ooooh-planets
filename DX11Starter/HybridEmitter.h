@@ -38,7 +38,7 @@ struct ParticleData
 	DirectX::XMFLOAT4 StartColor;
 	DirectX::XMFLOAT4 EndColor;
 
-	float Acceleration;
+	DirectX::XMFLOAT3 Acceleration;
 	//DirectX::XMFLOAT3 InitialForces;
 };
 
@@ -64,9 +64,10 @@ struct EmitterData
 	DirectX::XMFLOAT4 StartColor = {};
 	DirectX::XMFLOAT4 EndColor = {};
 	DirectX::XMFLOAT3 StartVelocity = {};
-	DirectX::XMFLOAT3 InitialForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
 	float StartSpeed = 0.0f; //for when direction will be figured out later
-	float InitialForce = 0.0f;
+	DirectX::XMFLOAT3 InitialForce = {};
+	DirectX::XMFLOAT3 InitialForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
+	float InitialForceMagnitude = 0.0f;
 	float Mass = 0.0f;
 	//DirectX::XMFLOAT3 StartForce = {};
 
@@ -155,7 +156,9 @@ private:
 	DirectX::XMFLOAT3 RandomSphereLocation(DirectX::XMFLOAT3 direction);
 	DirectX::XMFLOAT3 RandomSphericalDirection();
 
-	float CalcAcceleration();
+	DirectX::XMVECTOR CalcAcceleration();
+	//void CalcAcceleration(DirectX::XMFLOAT3* );
+	void CalcForce();
 
 	//calculates velocity for a spherical burst
 	DirectX::XMFLOAT3 SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition);

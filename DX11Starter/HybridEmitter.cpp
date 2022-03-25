@@ -8,12 +8,6 @@ HybridEmitter::HybridEmitter(EmitterData* emitData)
 	this->texture = emitterData->Texture;
 	this->context = emitterData->Context;
 
-	{
-		//ensure direction is normalized
-		DirectX::XMFLOAT3 dir = emitterData->InitialForceDirection;
-		DirectX::XMVECTOR normDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(dir.x, dir.y, dir.z, 1.0f));
-		DirectX::XMStoreFloat3(&emitterData->InitialForceDirection, normDirection);
-	}
 
 
 	timeSinceLastEmit = 0.0f;
@@ -77,6 +71,7 @@ HybridEmitter::~HybridEmitter()
 void HybridEmitter::Update(float dt, float currentTime)
 {
 	this->secBetweenParticleEmit = 1.0f / emitterData->ParticlesPerSecond;
+
 
 	//"first" as in the first one you would get to as the index counts up
 	//this would also make "first" living the "oldest" living particle
@@ -217,13 +212,22 @@ void HybridEmitter::EmitParticle(float emitTime)
 	if (livingCount >= emitterData->MaxParticles) //dont spawn more if its reached the max
 		return;
 
+	{
+		//ensure direction is normalized
+		DirectX::XMFLOAT3 dir = emitterData->InitialForceDirection;
+		DirectX::XMVECTOR normDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(dir.x, dir.y, dir.z, 1.0f));
+		DirectX::XMStoreFloat3(&emitterData->InitialForceDirection, normDirection);
+	}
+	CalcForce();
+
+
 	//update the particle with new information
 	particles[firstDeadIndex].EmitTime = emitTime;
 	particles[firstDeadIndex].Lifespan = emitterData->ParticleLifetime;
 	//float debug = emitTime - 
 	particles[firstDeadIndex].StartVelocity = emitterData->StartVelocity;
 	//particles[firstDeadIndex].StartDirection = emitterData->InitialForceDirection;
-	particles[firstDeadIndex].Acceleration = CalcAcceleration();
+	DirectX::XMStoreFloat3(&particles[firstDeadIndex].Acceleration, CalcAcceleration());
 
 	particles[firstDeadIndex].StartColor = emitterData->StartColor;
 	particles[firstDeadIndex].EndColor = emitterData->EndColor;
@@ -324,9 +328,31 @@ DirectX::XMFLOAT3 HybridEmitter::RandomSphericalDirection()
 	return output;
 }
 
-float HybridEmitter::CalcAcceleration()
+DirectX::XMVECTOR HybridEmitter::CalcAcceleration()
 {
-	return emitterData->InitialForce/emitterData->Mass;
+	DirectX::XMVECTOR force = DirectX::XMVectorSet(
+		emitterData->InitialForce.x,
+		emitterData->InitialForce.y,
+		emitterData->InitialForce.z,
+		1.0f);	
+	DirectX::XMVECTOR mass = DirectX::XMVectorSet(
+		emitterData->Mass,
+		emitterData->Mass,
+		emitterData->Mass,
+		1.0f);
+
+	return DirectX::XMVectorDivide(force, mass);
+}
+
+void HybridEmitter::CalcForce()
+{
+	DirectX::XMVECTOR direction = DirectX::XMVectorSet(
+		emitterData->InitialForceDirection.x, 
+		emitterData->InitialForceDirection.y, 
+		emitterData->InitialForceDirection.z, 
+		1.0f);
+	DirectX::XMVECTOR force = DirectX::XMVectorScale(direction, emitterData->InitialForceMagnitude);
+	DirectX::XMStoreFloat3(&emitterData->InitialForce, force);
 }
 
 DirectX::XMFLOAT3 HybridEmitter::SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition)
@@ -339,7 +365,8 @@ DirectX::XMFLOAT3 HybridEmitter::SphericalBurstVelocity(DirectX::XMFLOAT3 partic
 	DirectX::XMVECTOR directionFromCenter = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(particlePos, emitterCenter));
 
 	//scale by acceleration
-	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(directionFromCenter, CalcAcceleration());
+	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorMultiply(directionFromCenter, CalcAcceleration());
+	//DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(directionFromCenter, CalcAcceleration());
 
 	//store and return
 	DirectX::XMFLOAT3 finalVelocity;
@@ -348,7 +375,4 @@ DirectX::XMFLOAT3 HybridEmitter::SphericalBurstVelocity(DirectX::XMFLOAT3 partic
 	return finalVelocity;
 }
 
-DirectX::XMFLOAT3 HybridEmitter::SingleDirectionalForce()
-{
-	return DirectX::XMFLOAT3();
-}
+
