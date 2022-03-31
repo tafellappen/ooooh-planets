@@ -480,15 +480,18 @@ void Game::HybridEmitterSetup()
 	
 	hybridEmitData = new EmitterData;
 	hybridEmitData->EmitShape = EmitterShape::Sphere;
+	hybridEmitData->InitForceType = InitialForceType::SphereBurst;
 	hybridEmitData->StartSpeed = 0.0f;
 	hybridEmitData->ParticlesPerSecond = 10;
 	hybridEmitData->ParticleLifetime = 5;
 	hybridEmitData->MaxParticles = 400;
 	hybridEmitData->StartVelocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
-	hybridEmitData->InitialForceDirection = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	//the way i have this thing working is kinda weird, like the initial force isnt actually acting as the initial force
+	// 	   oh BOY i will love fixing this cant wait
+	//hybridEmitData->InitialForceDirection = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	//hybridEmitData->InitialForce = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	hybridEmitData->InitialForceMagnitude = 1.0f;
+	hybridEmitData->InitialForceMagnitude = 2.0f;
 	hybridEmitData->Mass = 1.0f;
 
 	hybridEmitData->StartColor = XMFLOAT4(1.0f, 0.1f, 0.1f, 0.7f);

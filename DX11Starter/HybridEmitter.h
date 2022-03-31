@@ -19,10 +19,13 @@ enum class EmitterShape
 	Sphere
 };
 
-enum class ParticleMoveType
+enum class InitialForceType
 {
-	Constant,
-	PhysicsSimulation
+	SphereBurst
+	//some random ideas for other types
+	//cone
+	//single direction
+	//nothing? or would that work as just having a zero magnitude instead of something here
 };
 
 struct ParticleData
@@ -52,6 +55,7 @@ struct EmitterData
 {
 	// shape and dimensions
 	EmitterShape EmitShape = EmitterShape::Point;
+	InitialForceType InitForceType = InitialForceType::SphereBurst;
 	float SphereRadius = 0.0f;
 	DirectX::XMFLOAT3 RectDimensions = {};
 
@@ -68,6 +72,10 @@ struct EmitterData
 	DirectX::XMFLOAT3 InitialForce = {};
 	DirectX::XMFLOAT3 InitialForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
 	float InitialForceMagnitude = 0.0f;
+
+	DirectX::XMFLOAT3 OngoingForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
+	float OngoingForceMagnitude = 0.0f;
+
 	float Mass = 0.0f;
 	//DirectX::XMFLOAT3 StartForce = {};
 
@@ -157,12 +165,14 @@ private:
 	DirectX::XMFLOAT3 RandomSphericalDirection();
 
 	DirectX::XMVECTOR CalcAcceleration();
+	DirectX::XMFLOAT3 StartingVelocityInDirection(DirectX::XMVECTOR direction);
+
 	//void CalcAcceleration(DirectX::XMFLOAT3* );
 	void CalcForce();
 
 	//calculates velocity for a spherical burst
 	DirectX::XMFLOAT3 SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition);
-	DirectX::XMFLOAT3 SingleDirectionalForce();
+	//DirectX::XMFLOAT3 SingleDirectionalForce();
 
 };
 

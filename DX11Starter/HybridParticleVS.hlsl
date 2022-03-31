@@ -19,7 +19,7 @@ struct Particle
 	float4 StartColor;
 	float4 EndColor;
 
-	float Acceleration;
+	float3 Acceleration;
 	//float LifetimeAcceleration;
 	//float Mass;
 	//float3 InitialForces;

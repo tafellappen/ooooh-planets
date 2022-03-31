@@ -254,11 +254,20 @@ void HybridEmitter::EmitParticle(float emitTime)
 		//DirectX::XMStoreFloat3(&particles[firstDeadIndex].StartVelocity, speedScale);
 
 		//decide StartingVelocity
-		particles[firstDeadIndex].StartVelocity = SphericalBurstVelocity(particles[firstDeadIndex].StartPosition);
 
 
 	}
 
+	switch (emitterData->InitForceType)
+	{
+	case InitialForceType::SphereBurst:
+		particles[firstDeadIndex].StartVelocity = SphericalBurstVelocity(particles[firstDeadIndex].StartPosition);
+
+	default:
+		//manually defaulting to outward burst for now
+		particles[firstDeadIndex].StartVelocity = SphericalBurstVelocity(particles[firstDeadIndex].StartPosition);
+		break;
+	}
 
 
 	firstDeadIndex++;
@@ -344,6 +353,18 @@ DirectX::XMVECTOR HybridEmitter::CalcAcceleration()
 	return DirectX::XMVectorDivide(force, mass);
 }
 
+//DirectX::XMFLOAT3 HybridEmitter::StartingVelocityInDirection(DirectX::XMVECTOR direction)
+//{
+////	//https://docs.microsoft.com/en-us/windows/win32/api/directxmath/nf-directxmath-xmvector3length - "The length of V is replicated into each component"
+////	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(direction, *DirectX::XMVector3Length(CalcAcceleration()).m128_f32);
+////
+//////store and return
+////	DirectX::XMFLOAT3 finalVelocity;
+////	DirectX::XMStoreFloat3(&finalVelocity, scaledVelocity);
+////
+////	return finalVelocity;
+//}
+
 void HybridEmitter::CalcForce()
 {
 	DirectX::XMVECTOR direction = DirectX::XMVectorSet(
@@ -365,14 +386,16 @@ DirectX::XMFLOAT3 HybridEmitter::SphericalBurstVelocity(DirectX::XMFLOAT3 partic
 	DirectX::XMVECTOR directionFromCenter = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(particlePos, emitterCenter));
 
 	//scale by acceleration
-	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorMultiply(directionFromCenter, CalcAcceleration());
-	//DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(directionFromCenter, CalcAcceleration());
+	//https://docs.microsoft.com/en-us/windows/win32/api/directxmath/nf-directxmath-xmvector3length - "The length of V is replicated into each component"
+	DirectX::XMVECTOR scaledVelocity = DirectX::XMVectorScale(directionFromCenter, *DirectX::XMVector3Length(CalcAcceleration()).m128_f32);
 
 	//store and return
 	DirectX::XMFLOAT3 finalVelocity;
-	DirectX::XMStoreFloat3(&finalVelocity, directionFromCenter);
+	DirectX::XMStoreFloat3(&finalVelocity, scaledVelocity);
 
 	return finalVelocity;
+
+	//return StartingVelocityInDirection(directionFromCenter);
 }
 
 
