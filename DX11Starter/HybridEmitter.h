@@ -73,6 +73,7 @@ struct EmitterData
 	DirectX::XMFLOAT3 InitialForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
 	float InitialForceMagnitude = 0.0f;
 
+	DirectX::XMFLOAT3 OngoingForce = {};
 	DirectX::XMFLOAT3 OngoingForceDirection = {}; //maybe this will be a "leave blank for outward burst" thing. actually that would be better as an enum in the future
 	float OngoingForceMagnitude = 0.0f;
 
@@ -164,11 +165,12 @@ private:
 	DirectX::XMFLOAT3 RandomSphereLocation(DirectX::XMFLOAT3 direction);
 	DirectX::XMFLOAT3 RandomSphericalDirection();
 
-	DirectX::XMVECTOR CalcAcceleration();
+	DirectX::XMVECTOR CalcAccelFromForce(DirectX::XMFLOAT3 force);
 	DirectX::XMFLOAT3 StartingVelocityInDirection(DirectX::XMVECTOR direction);
 
 	//void CalcAcceleration(DirectX::XMFLOAT3* );
-	void CalcForce();
+	void CalcInitialForce();
+	void CalcOngoingForce();
 
 	//calculates velocity for a spherical burst
 	DirectX::XMFLOAT3 SphericalBurstVelocity(DirectX::XMFLOAT3 particleStartPosition);
